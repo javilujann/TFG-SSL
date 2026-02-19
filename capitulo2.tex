@@ -1,0 +1,80 @@
+\chapter{Taxonomía de métodos de aprendizaje semi-supervisado}
+
+En este capítulo se va a presentar una taxonomía de los diferentes métodos de clasificación bajo el enfoque de aprendizaje semi-supervisado. Su objetivo es permitir un entendimiento claro de la base de los diferentes métodos con el fin de facilitar su comprensión y estudio. Para realizarla se ha utilizado como estructura principal la taxonomía presentada en el artículo \textit{A survey on Semi-supervised Learning, van Engelen y Hoos, 2020} \cite{van2020survey} a la que se le han realizado ciertas modificaciones debidamente motivadas buscando una mejor comprensión y adaptación a los objetivos de este trabajo.
+
+\section{Características discriminantes}
+
+Antes de exponer la taxonomía, se van a introducir posibles características discriminantes que pueden ser utilizadas para clasificar los diferentes métodos de aprendizaje semi-supervisado, explicando para cada una de ellas su significado y su importancia a la hora de clasificar los diferentes métodos. Finalmente, la taxonomía se creará a partir de estas características, asignando una jerarquía de niveles a las mismas y agrupando los diferentes métodos en las hojas del árbol resultante.
+
+\subsection{Suposición sobre la relación entre los datos etiquetados y no etiquetados}
+\label{sec:div-x-suposiciones}
+
+Como se explicó al final del último capítulo las diferentes suposiciones sobre cómo se relacionan los datos etiquetados y no etiquetados es una característica básica a la hora de entender los diferentes métodos de aprendizaje semi-supervisado. Es por esto que surge rápidamente como una posible característica discriminante a la hora de clasificar los diferentes métodos, como por ejemplo se hace en el libro de Chapelle \textit{Semi-supervised learning} \cite{10.7551/mitpress/9780262033589.001.0001}.
+
+Sin embargo, clasificar en base a esta característica no es ni tan sencillo ni tan claro como parece a primera vista. Por un lado, las suposiciones teóricas a menudo se solapan conceptualmente, o son compartidas por diferentes algoritmos cuya implementación matemática difiere radicalmente. Además, hay ciertos algoritmos de aprendizaje semi-supervisado -- como los métodos \textit{wrapper} que se presentarán más adelante--, que no se basan en suposiciones explícitas sobre los datos, por lo que una clasificación por esta característica resulta incompleta.  Por tanto, aunque es importante conocer la suposición de cada algoritmo a la hora de trabajar con él, una clasificación en base a esta característica puede no resultar suficientemente esclarecedora para entender las ideas y fundamentos en los que se basa.
+
+\subsection{Inductivo vs transductivo}
+\label{sec:div-inductivo-transductivo}
+
+Una segunda característica discriminante, que es, de hecho, un estándar de facto en la literatura a la hora de clasificar los diferentes métodos de aprendizaje semi-supervisado, es la distinción entre métodos inductivos y transductivos. Esta distinción se basa en el objetivo final del método: Por un lado, los \textbf{métodos inductivos} buscan aprender una función de predicción $f : \mathcal{X} \to \mathcal{Y}$ que pueda ser aplicada a cualquier punto del espacio de entrada $\mathcal{X}$, mientras que los \textbf{métodos transductivos} se centran en realizar predicciones únicamente para un conjunto específico de puntos de \textit{prueba}, los puntos no etiquetados de la entrada \cite{10.7551/mitpress/9780262033589.001.0001}.
+
+Esta distinción es crucial pues refleja el objetivo final de un método, y por tanto influye en su diseño y en las técnicas utilizadas para su implementación. Mientras que los métodos trasductivos pueden aprovechar al máximo la información de los datos no etiquetados para mejorar sus predicciones, los métodos inductivos deben ser capaces de generalizar a nuevos puntos de entrada, lo que puede requerir técnicas adicionales para evitar el sobreajuste a los datos de entrenamiento.
+
+\subsection{Generativo vs discriminante}
+\label{sec:div-generativo-discriminante}
+
+Otro criterio de clasificación estándar en la literatura, sobre todo la más clásica, es la distinción entre métodos generativos y discriminantes. Esta distinción se presentó de manera implícita en el capítulo anterior, cuando se explicó cómo la relación entre $p(x)$ y $p(y|x)$ es la razón por la que el aprendizaje semi-supervisado mejora sus predicciones.
+
+Este criterio clasifica los métodos en dos tipos: Los métodos \textbf{generativos} que buscan aprender un modelo de la probabilidad conjunta de los datos $p(x,y)$, de las entradas $x$, y de las etiquetas $y$, para hacer predicciones usando la regla de Bayes para calcular $p(y|x)$ y seleccionando la etiqueta más probable. Y los métodos \textbf{discriminantes} que se centran en modelar directamente la probabilidad a posteriori $p(y|x)$ o aprenden un mapeo directo de las entradas a las etiquetas \cite{ng2001discriminative}.
+
+Esta distinción es muy útil pues permite comprender los fundamentos que hay detrás de un método, antes de abordar los detalles de su implementación concreta. Sin embargo, no es una distinción perfecta, ya que no contempla todos los posibles métodos, en particular, los métodos que se basan en la geometría o topología de los datos --como los métodos basados en grafos o variedades--.
+
+\subsection{Basado en el uso de los datos no etiquetados}
+\label{sec:div-uso-etiquetas}
+
+Finalmente, se presenta una última característica discerniente, la forma en la que los diferentes algoritmos hacen uso de los datos no etiquetados. Esta característica es la base de la taxonomía que se presenta en el trabajo de van Engelen y Hoos \cite{van2020survey}, y por ende es la base de la taxonomía presentada en este trabajo.
+
+Esta característica clasifica los algoritmos de aprendizaje semi-supervisado en tres grupos: 
+\begin{itemize}
+    \item Los métodos \textbf{Envolventes} o \textbf{Wrapper}, métodos que se basan en un paso de pseudo-etiquetado. Es decir, se basan en un proceso que utiliza uno o varios algoritmos supervisados, que parten solo con los datos etiquetados, y va iterativamente etiquetando parte de los datos no etiquetados usando estos algoritmos, para posteriormente reentrenarlos usando estas nuevas etiquetas, sin que estos distingan la diferencia entre etiquetas iniciales y etiquetadas por el proceso. 
+    \item Los métodos basados en \textbf{preprocesado no supervisado}, aquellos que se basan en un pipeline de dos etapas: una primera etapa de preprocesamiento no supervisado, que puede ser por ejemplo una etapa de reducción de dimensionalidad o de extracción de características, seguida de una etapa de clasificación donde un algoritmo supervisado, agnóstico a la etapa anterior, se entrena con los datos etiquetados y  la representación obtenida en la primera etapa.
+    \item Los métodos \textbf{intrínsecamente semi-supervisados}, que directamente optimizan una función objetivo haciendo uso tanto de los datos etiquetados como los no etiquetados. Por tanto, no necesitan pasos intermedios ni algoritmos supervisados de base, sino que usualmente son extensiones de estos algoritmos supervisados que integran de manera explícita los datos no etiquetados en su formulación matemática.
+\end{itemize}
+
+El empleo de esta característica para clasificar es de gran utilidad, ya que permite realizar una división funcional de los métodos clara y sencilla, que permite entender la estructura general detrás de un método, sin necesidad de abordar los fundamentos matemáticos del mismo. 
+
+\section{Taxonomía}
+
+Basándose en todo lo explicado anteriormente, se presenta en la figura \ref{fig:taxonomia-ssl} una taxonomía de, principalmente, dos niveles de profundidad, que profundiza a un tercer nivel en los métodos inductivos intrínsecamente semi-supervisados.
+
+\begin{enumerate}
+    \item Primero, se distingue entre los métodos inductivos o transductivos.
+    \item Una vez clasificados en base a esta característica, se considera cómo el algoritmo hace uso de los datos no etiquetados.
+    \item Finalmente, dentro de los métodos inductivos e intrínsecamente semi-supervisados, se realiza una última distinción basada en el fundamento matemático del método, distinguiendo entre métodos generativos y discriminantes, añadiendo además una tercera rama para los métodos geométricos (basados en variedades).
+\end{enumerate}
+
+Cabe notar, como se viene comentando, la similitud entre esta taxonomía y la presentada en el trabajo de van Engelen y Hoos \cite{van2020survey}. Se va primero a explicar las similitudes, que son las que forman la base de la taxonomía presentada, para posteriormente explicar las diferencias que hay entre ambas.
+
+La primera similitud es la división inicial de la taxonomía en métodos inductivos y transductivos, esta división, estándar de facto en la literatura, es, como se ha comentado en la sección \ref{sec:div-inductivo-transductivo}, crucial para entender el objetivo final de un método y por tanto es lo primero que se ha de tener en cuenta a la hora de abordar un método de aprendizaje semi-supervisado. 
+
+La segunda similitud, y la base de la taxonomía de van Engelen y Hoos \cite{van2020survey}, es la división de los métodos inductivos en base a cómo hacen uso de los datos no etiquetados, esta división, como se ha comentado en la sección \ref{sec:div-uso-etiquetas}, permite entender la estructura general detrás de un método, siendo una herramienta muy útil para comprender de antemano un método o algoritmo.  
+
+Estas similitudes fundamentan la base de una taxonomía sólida y clara, que permite entender como va actuar de manera general un método, sin necesidad de abordar los detalles matemáticos del mismo. 
+
+Sin embargo, y aquí aparece la primera diferencia, para realizar esta taxonomía, se ha decidido seguir otro estándar de la literatura, y distinguir entre los métodos discriminantes y generativos, como se ha explicado en la sección \ref{sec:div-generativo-discriminante}. Esta distinción permite entender mejor los fundamentos matemáticos sobre los que se basa cada método, y aunque no engloba todos los métodos, al realizarse únicamente dentro de los métodos inductivos intrínsecamente semi-supervisados, no resulta tan limitante como si se realizara a un nivel más alto de la taxonomía.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{imagenes/taxonomia.png}
+    \caption{Taxonomía de métodos de aprendizaje semi-supervisado.}
+    \label{fig:taxonomia-ssl}
+\end{figure}
+
+De esta forma, la taxonomía propuesta reorganiza los métodos intrínsecos en tres ramas diferenciadas: la familia de métodos generativos; la de métodos discriminantes —que agrupa bajo un mismo paraguas conceptual a los enfoques de máximo margen y a los basados en perturbaciones—; y finalmente, una categoría independiente para los métodos basados en variedades, reconociendo así su naturaleza geométrica distintiva.
+
+Además de esta diferencia, se han añadido dos cambios menores:  
+
+Por un lado, para mantener la simetría entre los métodos inductivos y transductivos, se ha añadido en la rama de los métodos transductivos la división sobre el uso de los datos no etiquetados, aunque en este caso solo hay algoritmos intrínsecamente semi-supervisados. De esta manera se mantiene la simetría entre ambas ramas, y permite tener una mayor comprensión con tan solo ver la figura.
+
+Por último, dentro de los métodos envolventes, se ha cambiado el nombre de la familia presentada por van Engelen y Hoos \cite{van2020survey} como co-training por \textit{métodos basados en desacuerdo}. De esta manera, se evita nombrar a la familia por un algoritmo en concreto dentro de esta, el algoritmo de co-training de Blum y Mitchell \cite{blum1998combining}. El objetivo del nuevo nombre, que se desarrollará en profundidad en el siguiente capítulo, es reflejar la idea general de esta familia de métodos tal y como se presenta en el trabajo de Zhou y Li \cite{zhou2010semi}.
+

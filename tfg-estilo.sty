@@ -1,0 +1,283 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tfg-estilo}
+
+\def\@sep{25mm}
+\RequirePackage[margin=25mm,top=30mm,headsep=10mm]{geometry}
+\RequirePackage[pdftex]{graphicx}
+\RequirePackage[pdftex,usenames,dvipsnames]{xcolor}
+\RequirePackage{amsfonts,amsmath,amssymb}
+\RequirePackage{theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Estilo de las páginas %
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{fancyhdr}
+\pagestyle{fancyplain}
+\addtolength{\headwidth}{\marginparsep}
+\addtolength{\headwidth}{\marginparwidth}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\lhead[\fancyplain{}{\bfseries\thepage}]%
+      {\fancyplain{}{\bfseries\rightmark}}
+\rhead[\fancyplain{}{\bfseries\leftmark}]%
+      {\fancyplain{}{\bfseries\thepage}}
+\cfoot{}
+
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
+    \hbox{}\thispagestyle{empty}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+
+%%%%%%%%%%%%%
+% Sombreado %
+%%%%%%%%%%%%%
+
+\def\colorshadedbox#1{\gdef\@colorshadedbox{#1}}
+\def\colorshadedboxrule#1{\gdef\@colorshadedboxrule{#1}}
+\definecolor{gris}{gray}{.9}
+\def\normalcolorshadedbox{\colorshadedbox{gris}\colorshadedboxrule{gris}}
+\normalcolorshadedbox
+
+\newlength\shadedsep
+\newlength\shadedboxrule
+\newif\ifshadedbox\shadedboxfalse
+
+\long\def\shadedbox{\@ifnextchar[{\shadedbox@}{\shadedbox@[\hsize]}}
+\long\def\shadedbox@[#1]#2{%
+ \@tempdima=#1
+ \advance\@tempdima-2\shadedsep
+ \advance\@tempdima-2\shadedboxrule
+ \ignorespaces\hspace*{-2pt}\VerbBox\@shadedbox{\parbox[t]{\@tempdima}{#2}}
+ }
+\def\@shadedbox#1{%
+ \fboxsep\shadedsep
+ \fboxrule\shadedboxrule
+ \setbox\@fancybox\hbox{#1}%
+ \fcolorbox{\@colorshadedboxrule}{\@colorshadedbox}{\copy\@fancybox}
+ }
+
+\newsavebox\shapedpar
+\newsavebox\boxtemp
+
+\newlength\shadowtextsep
+
+\def\shadowtext#1{%
+ \setbox\boxtemp\hbox{\parbox{\hsize}{#1}}%
+ \@tempdima=\wd\boxtemp
+ \@tempdimb=\ht\boxtemp
+ \hfill\vbox{\offinterlineskip%
+  \hspace*{\shadowtextsep}%
+  \textcolor[gray]{.8}{\copy\boxtemp}%
+  \hspace*{-\@tempdima}\hspace*{-\shadowtextsep}%
+  \hbox{\raise\shadowtextsep\hbox{\textcolor{black}{\copy\boxtemp}}}%
+  }
+}
+
+%%%%%%%%%%%%%
+% Capitulos %
+%%%%%%%%%%%%%
+
+\def\@makechapterhead#1{%
+%  \vspace*{50\p@}%
+  {\parindent\z@\raggedright\normalfont
+    \ifnum\c@secnumdepth>\m@ne
+        \unitlength1mm
+        \begin{picture}(100,40)
+        \put(0,0){\rotatebox{90}{\resizebox{40mm}{5mm}{\colorbox{Black}{\color{White}\sffamily\MakeUppercase\@chapapp}}}}
+        \ifnum\c@chapter>9
+           \put(6,0){\resizebox{25mm}{40mm}{\color{Gray}\sffamily\thechapter}}
+        \else
+           \put(8,0){\resizebox{15mm}{40mm}{\color{Gray}\sffamily\thechapter}}
+        \fi
+        \put(90,17){\makebox(0,0){%
+             \scalebox{1}[1.5]{\begin{minipage}{120mm}
+                  \shadowtext{\raggedright\Huge\bfseries\sffamily #1}
+             \end{minipage}}
+        }}
+        \end{picture}
+    \fi
+    \vskip 40\p@
+  }}
+\def\@makeschapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \scalebox{1}[1.5]{\begin{minipage}{120mm}
+            \shadowtext{\raggedright\Huge\bfseries\sffamily #1}
+        \end{minipage}}
+    \fi
+    \vskip 40\p@
+  }}
+
+%%%%%%%%%%%
+% Caption %
+%%%%%%%%%%%
+
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{\footnotesize\sffamily #1:~#2}%
+  \ifdim \wd\@tempboxa >\hsize
+    \sbox\@tempboxa{\footnotesize\sffamily #1:~}%
+    \@tempdima=\wd\@tempboxa
+    \hangindent\@tempdima
+    \hangafter1
+    {\footnotesize\sffamily #1:~#2}
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Indices de contenidos, figuras y tablas %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\listoffigures{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapter*{\listfigurename}%
+    \@mkboth{\listfigurename}{\listfigurename}%
+    \addcontentsline{toc}{chapter}{\listfigurename}
+    \@starttoc{lof}%
+    \if@restonecol\twocolumn\fi
+    }
+\def\listoftables{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapter*{\listtablename}%
+    \@mkboth{\listtablename}{\listtablename}%
+    \addcontentsline{toc}{chapter}{\listtablename}
+    \@starttoc{lot}%
+    \if@restonecol\twocolumn\fi
+    }
+\def\tableofcontents{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapter*{\contentsname}%
+    \@mkboth{\contentsname}{\contentsname}%
+    \@starttoc{toc}%
+    \if@restonecol\twocolumn\fi
+    }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Referencias bibliográficas %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewenvironment{thebibliography}[1]
+     {\chapter*{\bibname}%
+      \@mkboth{\bibname}{\bibname}
+      \addcontentsline{toc}{chapter}{\bibname}
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Letras grandes de capítulos y secciones %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newlength\@hangindent
+\newlength\@hangheight
+
+\def\@uno{1}
+\def\@dos{2}
+\def\@tres{3}
+\def\@cuatro{4}
+
+\def\first{\@ifnextchar[{\@first}{\@first[2]}}
+\newlength\first@height
+\newlength\first@width
+
+\def\@first[#1]#2{
+ \def\@tmp{#1}
+ \ifx\@tmp\@cuatro\first@height52pt\first@width30pt%
+   \else\first@height21.5pt\first@width15pt\fi%
+ \@hangindent\first@width
+ \advance\@hangindent.15\first@width
+ \hangindent\@hangindent
+ \ifx\@tmp\@cuatro\def\@hangafter{4}%
+  \else\def\@hangafter{2}\fi%
+ \hangafter-\@hangafter
+ \noindent\hspace*{-\@hangindent}%
+ \setbox\boxtemp\hbox{T}%
+ \@tempdima\ht\boxtemp%
+ \vbox to 0pt{\vskip-\@tempdima\hbox to 0pt{%
+ \resizebox{\first@width}{\first@height}{#2}%
+ }}%
+ \hspace*{\@hangindent}%
+ \ignorespaces%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Altura de las páginas %
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\thispageshort{\enlargethispage{-\baselineskip}}
+\def\thispagelong{\enlargethispage{\baselineskip}}
+\def\thispageveryshort{\enlargethispage{-2\baselineskip}}
+\def\thispageverylong{\enlargethispage{2\baselineskip}}
+\newcommand{\pagcorta}[1][1]{\enlargethispage{-#1\baselineskip}}
+
+\let\Itemize\itemize
+\def\itemize{\Itemize\vspace*{-\parskip}\itemsep0pt}
+
+\let\Enumerate\enumerate
+\def\enumerate{\Enumerate\vspace*{-\parskip}\itemsep0pt}
+
+\let\Endenumerate\endenumerate
+\def\endenumerate{\Endenumerate\vspace*{-\parskip}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Parámetros iniciales %
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\bottomfraction{0.7}
+\def\floatpagefraction{0.8}
+\def\textfraction{0.1}
+
+\shadedsep 3mm
+\shadedboxrule 0pt
+\shadowtextsep2pt
+
+\headwidth\textwidth
+\advance\headheight1.6pt
+
+\parskip=5pt plus1pt minus1pt
+
+\hfuzz=.5pt
+
+\def\arraystretch{1.1}
+\def\baselinestretch{1.0}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+\setcounter{tocdepth}{2}
+
+\ignorespacesafterend
+\deactivatetilden
+
+\def\contentsname{\'Indice general}
+\def\listfigurename{\'Indice de figuras}
+\def\listtablename{\'Indice de tablas}

@@ -1,0 +1,71 @@
+\chapter{Introducción}
+
+En este capítulo se introducen los conceptos básicos necesarios para el desarrollo de este trabajo. En la sección \ref{sec:introduccion} se realiza una introducción informal que abarca desde el Machine Learning hasta llegar al aprendizaje semisupervisado. Posteriormente, en la sección \ref{sec:problema_clasificacion} se presenta una definición formal de la clasificación semi-supervisada, el concepto sobre el que se articula el trabajo. Finalmente, en la sección \ref{sec:suposiciones}, se presentan las suposiciones que hay detrás del aprendizaje semi-supervisado, y que son necesarias para entender cómo este puede obtener mejor rendimiento que el aprendizaje supervisado, y de cuándo es así.
+
+\section{Introducción al aprendizaje semi-supervisado}
+\label{sec:introduccion}
+
+El \textbf{aprendizaje computacional}, o Machine Learning, tiene muchas definiciones, pero de manera intuitiva se puede decir que es el estudio de los métodos computacionales -- algoritmos -- que mejoran su rendimiento o realizan predicciones haciendo uso de experiencia previa \cite{mohri2018foundations}.
+
+Esta experiencia previa viene normalmente dada en forma de ejemplos, instancias de los datos que usa el modelo o algoritmo, que normalmente se representan como un vector de características o atributos. Además, es común que cada ejemplo venga acompañado de una etiqueta (\textit{label}), es decir, de un valor o categoría asociado al ejemplo. El conjunto de todos los ejemplos usados por un algoritmo para mejorar su rendimiento se conoce como el conjunto de entrenamiento. \cite{mohri2018foundations} 
+
+Dentro del aprendizaje computacional, se pueden distinguir dos grandes categorías:
+
+Por un lado, tenemos el \textbf{Aprendizaje Supervisado}: Aplicaciones en las que los datos de entrenamiento consisten en ejemplos de vectores de entrada con sus correspondientes etiquetas de salida \cite{bishop2006pattern}. En el que a su vez se presenta otra gran subdivisión:  ``Casos [...] donde el objetivo es asignar cada vector de entrada a un número finito de categorías discretas, son llamados problemas de clasificación. Mientras que, si la salida deseada consiste en una o más variables continuas, entonces la tarea se llama regresión'' \cite{bishop2006pattern}.
+
+Por otro lado, tenemos el \textbf{Aprendizaje No Supervisado} cuando ``el conjunto de datos de entrenamiento consisten en ejemplos de vectores de entrada sin sus correspondientes etiquetas de salida'' \cite{bishop2006pattern}. En este caso, el objetivo puede ser encontrar grupos de ejemplos similares en los datos, \textit{clustering}; determinar la distribución de los datos en el espacio de entrada, \textit{density estimation}; o proyectar los datos de un espacio de alta dimensión a uno más sencillo, \textit{dimensionality reduction} \cite{bishop2006pattern}.
+
+\clearpage
+
+Aparte de estas dos categorías, cabe mencionar otra de gran importancia, el \textbf{Aprendizaje por Refuerzo}. Este es bastante diferente a los anteriores, pues se basa en la idea de que el algoritmo de aprendizaje interactúa activamente con el entorno y en algunos casos afecta al entorno, y recibe una recompensa inmediata por cada acción. El objetivo del algoritmo de aprendizaje es maximizar su recompensa a lo largo de un curso de acciones e interacciones con el entorno \cite{mohri2018foundations}. Aunque no vayamos a profundizar en el mismo en este trabajo, es importante mencionarlo al ser una rama importante del aprendizaje computacional, y también es importante mencionar su principal dilema, el \textit{exploración vs explotación}: la búsqueda del equilibrio entre explorar nuevas acciones para obtener más información, y explotar las acciones que ya conoce para maximizar su recompensa \cite{bishop2006pattern}.
+
+Sin embargo, en este trabajo nos vamos a centrar en una rama del aprendizaje computacional distinta, y que se encuentra a medio camino entre los tipos de aprendizaje principales. El \textbf{Aprendizaje Semi-Supervisado}, la rama del aprendizaje computacional que usa tanto datos etiquetados como no etiquetados para realizar distintas tareas de aprendizaje \cite{van2020survey}. 
+
+Aun así, esta definición de aprendizaje semi-supervisado es demasiado general para los objetivos de este trabajo, es por esto que se va a tomar el enfoque propuesto por Seeger (2006) en ``A taxonomy for semi-supervised learning methods''\cite{seeger2006taxonomy}, donde se considera al aprendizaje semi-supervisado como una extensión del aprendizaje supervisado que se beneficia de la presencia de datos no etiquetados. Denominando como \textbf{semi-unsupervised learning} a aquellas tareas de aprendizaje no supervisado que se benefician de la presencia de datos etiquetados.
+
+Este tipo de aprendizaje es muy atractivo por dos razones: por un lado, porque puede potencialmente utilizar tanto datos etiquetados como no etiquetados para lograr un mejor rendimiento que el aprendizaje supervisado. Y, por otro lado, porque puede lograr el mismo nivel de rendimiento que el aprendizaje supervisado, pero con menos instancias etiquetadas \cite{zhu2009introduction}. Lo cual es muy interesante debido al coste que supone etiquetar los datos --anotadores humanos expertos en la materia en específico--, frente a la abundancia y el bajo coste de obtención de los datos no etiquetados. 
+
+Finalmente, dentro del aprendizaje semi-supervisado, al ser una extensión del aprendizaje supervisado, se vuelve a encontrar la subdivisión entre problemas de clasificación y regresión. Este trabajo se va a centrar únicamente en el aprendizaje semi-supervisado para problemas de clasificación, aunque muchos de los resultados que se presentan también se pueden aplicar al aprendizaje semi-supervisado para problemas de regresión.
+
+\section{Problema de clasificación semi-supervisado}
+\label{sec:problema_clasificacion}
+
+Una vez introducido el concepto principal del trabajo, el aprendizaje semi-supervisado, y dado que este trabajo se va a centrar en el aprendizaje semi-supervisado para problemas de clasificación, es necesario definir de manera formal este problema. Para ello, vamos a hacer uso de una serie de definiciones que se encuentran en el libro de Xiaojin Zhu, ``Introduction to Semi-Supervised Learning'' \cite{zhu2009introduction}, y que se presentan a continuación.
+
+Como primer paso se presenta la definición del aprendizaje supervisado, que, como se ha mencionado, es la base del aprendizaje semi-supervisado:
+
+\begin{defi}[Aprendizaje Supervisado]
+Sea $\mathcal{X}$ el dominio de las instancias, e $\mathcal{Y}$ el dominio de las etiquetas. Sea $P(\mathbf{x},y)$ una distribución de probabilidad conjunta (desconocida) sobre las instancias y etiquetas $\mathcal{X} \times \mathcal{Y}$. Dado un conjunto de entrenamiento $\{(\mathbf{x}_i, y_i)\}_{i=1}^n$ con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ (independiente e idénticamente distribuido), el aprendizaje supervisado entrena una función $f : \mathcal{X} \to \mathcal{Y}$ en alguna familia de funciones $\mathcal{F}$, con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ también.
+\end{defi}
+
+Partiendo de esta definición de aprendizaje supervisado, se puede entonces definir el problema de clasificación:
+
+\begin{defi}[Clasificación]
+La clasificación es el problema de aprendizaje supervisado con clases discretas $\mathcal{Y}$. La función $f$ se denomina clasificador.
+\end{defi}
+
+Para finalmente poder formalizar el problema de clasificación dentro del aprendizaje semi-supervisado:
+
+\begin{defi}[Clasificación Semi-Supervisada]
+Es una extensión del problema de clasificación supervisada. Los datos de entrenamiento consisten tanto en $l$ instancias etiquetadas $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$ como en $u$ instancias no etiquetadas $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$. Se asume típicamente que hay muchos más datos no etiquetados que etiquetados, es decir, $u \gg l$. El objetivo de la clasificación semi-supervisada es entrenar un clasificador $f$ a partir de los datos etiquetados y no etiquetados, de tal manera que sea mejor que el clasificador supervisado entrenado únicamente con los datos etiquetados.
+\end{defi}
+
+De esta manera, queda establecido de manera formal el marco teórico sobre el que se va a desarrollar este trabajo. En los siguientes capítulos se va a, primero, presentar una taxonomía para los métodos de clasificación semi-supervisada, para posteriormente desarrollar algunos de estos con mayor profundidad. Pero antes de terminar este capítulo, se va a presentar una idea de cómo el aprendizaje semi-supervisado obtiene mejor rendimiento que el aprendizaje supervisado, y de cuándo es así.
+
+\section{Suposiciones del aprendizaje semi-supervisado}
+\label{sec:suposiciones}
+
+Aunque no todos los métodos de aprendizaje semi-supervisado se basan explícitamente en probabilidades, resulta útil para entender cómo el aprendizaje semi-supervisado puede obtener mejor rendimiento que el aprendizaje supervisado, asumir que los métodos representan las hipótesis como $p(y \mid x)$ y los datos no etiquetados como $p(x)$. De esta manera, la información que proporciona $p(x)$ se puede introducir de dos posibles formas: o bien en modelos que estiman la distribución conjunta $p(x,y)$ que comparte parámetros con $p(x)$, o bien modificando la función objetivo para incluir términos de $p(x)$ \cite{zhu2005semi}. En ambos casos, el aprendizaje semi-supervisado puede obtener mejor rendimiento que el aprendizaje supervisado, porque puede aprovechar la información contenida en los datos no etiquetados para mejorar la estimación de $p(y \mid x)$.
+
+Sin embargo, aunque a priori parece que el aprendizaje semi-supervisado siempre debería obtener mejor rendimiento que el aprendizaje supervisado, esto no es así. Detrás de cada método de aprendizaje semi-supervisado hay una serie de suposiciones sobre la relación entre $p(x)$ y $p(y \mid x)$, y si estas suposiciones no se cumplen, el aprendizaje semi-supervisado puede obtener un rendimiento peor que el aprendizaje supervisado \cite{zhu2009introduction}.
+
+Veamos entonces, de manera breve, cuáles son estas suposiciones como las presenta Chappel et al. (2006) en ``Semi-supervised learning'' \cite{10.7551/mitpress/9780262033589.001.0001}:
+
+\begin{itemize}
+    \item \textbf{Suposición de suavidad}: Si dos puntos $x_1$ y $x_2$ en una región de alta densidad están cerca, entonces también deben estarlo sus correspondientes salidas $y_1$ y $y_2$. 
+    \item \textbf{Suposición de clústers}: Si los puntos se encuentran en un mismo clúster, es probable que tengan la misma etiqueta. 
+    \item \textbf{Suposición de baja densidad}: La frontera de decisión debe pasar por regiones de baja densidad. Esta suposición es una reformulación de la suposición de clústers pues si los puntos de un mismo clúster tienen la misma etiqueta, entonces la frontera de decisión debe pasar por regiones de baja densidad donde no haya clústers.
+    \item \textbf{Suposición de variedad subyacente}: Los datos, de alta dimensión, se encuentran (aproximadamente) en un manifold de baja dimensión.
+\end{itemize}
+
+Conforme se vayan presentando los distintos métodos de clasificación semi-supervisada, se irá viendo cuáles de ellos se basan en una o varias de estas suposiciones, y cómo el rendimiento de estos método dependerá de si estas suposiciones se cumplen o no en los datos con los que se trabaja.

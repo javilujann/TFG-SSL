@@ -1,0 +1,57 @@
+\documentclass[a4paper,12pt,twoside]{book}
+% Paquete para determinar la codificación del archivo. Las opciones usuales son utf8 y latin1
+\usepackage[utf8]{inputenc}
+% Paquete para personalizar el idioma.
+\usepackage[english,spanish]{babel}
+% Paquetes de fuentes
+\usepackage{mathptmx}
+\usepackage{helvet}
+% Paquete para hiperenlaces
+\usepackage[colorlinks]{hyperref}
+\hypersetup{linkcolor=Blue,citecolor=Green}
+% Paquete que contiene las definiciones de la plantilla
+\usepackage{tfg-estilo}
+
+{\theorembodyfont{\itshape}
+\newtheorem{theo}{Teorema}[chapter]
+\newtheorem{prop}[theo]{Proposición}
+\newtheorem{coro}[theo]{Corolario}
+\newtheorem{lemm}[theo]{Lema}
+} {\theorembodyfont{\upshape}
+\newtheorem{rema}[theo]{Observación}
+\newtheorem{defi}[theo]{Definición}
+\newtheorem{example}[theo]{Ejemplo}
+}
+\def\theequation{\thesection.\arabic{equation}}
+\def\thetheo{\thesection.\arabic{theo}}
+\newenvironment{proof}{\ignorespaces\par\noindent\textbf{Demostración.}\quad}{\hfill$\Box$\par}
+
+\begin{document}
+
+\input{portada.tex}
+
+\input{agradecimientos.tex}
+
+\frontmatter
+\pagestyle{fancyplain}
+
+\tableofcontents
+
+\input{abstract.tex}
+
+\input{resumen.tex}
+
+\mainmatter
+
+\input{capitulo1.tex}
+
+\input{capitulo2.tex}
+
+
+\backmatter
+
+\bibliographystyle{plain}
+\bibliography{bibliografia}
+
+\end{document}
+
