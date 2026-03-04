@@ -18,7 +18,7 @@ Sin embargo, clasificar en base a esta característica no es ni tan sencillo ni 
 
 Una segunda característica discriminante, que es, de hecho, un estándar de facto en la literatura a la hora de clasificar los diferentes métodos de aprendizaje semi-supervisado, es la distinción entre métodos inductivos y transductivos. Esta distinción se basa en el objetivo final del método: Por un lado, los \textbf{métodos inductivos} buscan aprender una función de predicción $f : \mathcal{X} \to \mathcal{Y}$ que pueda ser aplicada a cualquier punto del espacio de entrada $\mathcal{X}$, mientras que los \textbf{métodos transductivos} se centran en realizar predicciones únicamente para un conjunto específico de puntos de \textit{prueba}, los puntos no etiquetados de la entrada \cite{10.7551/mitpress/9780262033589.001.0001}.
 
-Esta distinción es crucial pues refleja el objetivo final de un método, y por tanto influye en su diseño y en las técnicas utilizadas para su implementación. Mientras que los métodos trasductivos pueden aprovechar al máximo la información de los datos no etiquetados para mejorar sus predicciones, los métodos inductivos deben ser capaces de generalizar a nuevos puntos de entrada, lo que puede requerir técnicas adicionales para evitar el sobreajuste a los datos de entrenamiento.
+Esta distinción es crucial pues refleja el objetivo final de un método, y por tanto influye en su diseño y en las técnicas utilizadas para su implementación. Mientras que los métodos transductivos pueden aprovechar al máximo la información de los datos no etiquetados para mejorar sus predicciones, los métodos inductivos deben ser capaces de generalizar a nuevos puntos de entrada, lo que puede requerir técnicas adicionales para evitar el sobreajuste a los datos de entrenamiento.
 
 \subsection{Generativo vs discriminante}
 \label{sec:div-generativo-discriminante}
@@ -32,7 +32,7 @@ Esta distinción es muy útil pues permite comprender los fundamentos que hay de
 \subsection{Basado en el uso de los datos no etiquetados}
 \label{sec:div-uso-etiquetas}
 
-Finalmente, se presenta una última característica discerniente, la forma en la que los diferentes algoritmos hacen uso de los datos no etiquetados. Esta característica es la base de la taxonomía que se presenta en el trabajo de van Engelen y Hoos \cite{van2020survey}, y por ende es la base de la taxonomía presentada en este trabajo.
+Finalmente, se presenta una última característica discriminante, la forma en la que los diferentes algoritmos hacen uso de los datos no etiquetados. Esta característica es la base de la taxonomía que se presenta en el trabajo de van Engelen y Hoos \cite{van2020survey}, y por ende es la base de la taxonomía presentada en este trabajo.
 
 Esta característica clasifica los algoritmos de aprendizaje semi-supervisado en tres grupos: 
 \begin{itemize}

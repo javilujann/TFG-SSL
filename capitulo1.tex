@@ -1,23 +1,23 @@
 \chapter{Introducción}
 
-En este capítulo se introducen los conceptos básicos necesarios para el entender el posterior desarrollo del trabajo. Realizando en la sección \ref{sec:introduccion} una introducción informal que abarca desde el Machine Learning hasta llegar al aprendizaje semisupervisado. De manera complementaria, en la sección \ref{sec:estructura}, se presenta la estructura del trabajo. 
+En este capítulo se introducen los conceptos básicos necesarios para entender el posterior desarrollo del trabajo. En la sección \ref{sec:introduccion} se realiza una introducción informal que abarca desde el Machine Learning hasta llegar al aprendizaje semi-supervisado. De manera complementaria, en la sección \ref{sec:estructura}, se presenta la estructura del trabajo. 
 
 \section{Conceptos iniciales}
 \label{sec:introduccion}
 
-El \textbf{aprendizaje computacional}, o Machine Learning, tiene muchas definiciones, pero de manera intuitiva entener como la rama de la ciencia encargada del diseño y construcción de algoritmos que apartir de experiencia previa, normalmente dada como un conjunto de datos de entrenamiento, son capaces de aprender patrones que les permitirá realizar predicciones o tomar decisiones sobre nuevos datos, es decir, les permite generalizar \cite{ibm_ml_guide_2026}.
+El \textbf{aprendizaje computacional}, o Machine Learning, tiene muchas definiciones, pero de manera intuitiva se puede entender como la rama de la ciencia encargada del diseño y construcción de algoritmos que, a partir de experiencia previa, normalmente dada como un conjunto de datos de entrenamiento, son capaces de aprender patrones que les permiten realizar predicciones o tomar decisiones sobre nuevos datos, es decir, les permite generalizar \cite{mohri2018foundations}.
 
 Esta experiencia previa viene generalmente dada en forma de ejemplos, que son instancias de los datos que usa el modelo o algoritmo, y que normalmente se representan como un vector $\mathbf{x}$ de características o atributos. Además, en algunos casos los ejemplos vienen acompañados de una etiqueta $y$, que no es más que un valor o categoría asociado a un vector $\mathbf{x}$. El conjunto de todos los ejemplos usados por un algoritmo para mejorar su rendimiento se conoce como el conjunto de entrenamiento. \cite{mohri2018foundations} 
 
 Dentro del aprendizaje computacional, se pueden distinguir tres grandes categorías:
 \begin{itemize}
-    \item Por un lado, tenemos el \textbf{Aprendizaje Supervisado} aquellas aplicaciones en las que el conjunto de entrenamiento esta formado por \textit{datos etiquetados}, es decir, pares $(\mathbf{x}, y)$ de vectores de entrada con sus correspondientes etiquetas de salida \cite{bishop2006pattern}, y el objetivo es obtener un algoritmo que sea capaz de predecir la etiqueta $y$ de nuevos vectores $\mathbf{x}$ no vistos durante el entrenamiento. Dentro de esta categoría se presenta otra gran subdivisión entre los casos en los que la etiqueta a predecir esta dentro de un conjunto finito de categorías, lo que se conoce como \textit{problemas de clasificación}; y los casos en los que la etiqueta a predecir es una variable continua, lo que se conoce como \textit{problemas de regresión} \cite{bishop2006pattern}. 
+    \item Por un lado, tenemos el \textbf{Aprendizaje Supervisado}, aquellas aplicaciones en las que el conjunto de entrenamiento está formado por \textit{datos etiquetados}, es decir, pares $(\mathbf{x}, y)$ de vectores de entrada con sus correspondientes etiquetas de salida \cite{bishop2006pattern}, y el objetivo es obtener un algoritmo que sea capaz de predecir la etiqueta $y$ de nuevos vectores $\mathbf{x}$ no vistos durante el entrenamiento. Dentro de esta categoría se presenta otra gran subdivisión entre los casos en los que la etiqueta a predecir está dentro de un conjunto finito de categorías, lo que se conoce como \textit{problemas de clasificación}; y los casos en los que la etiqueta a predecir es una variable continua, lo que se conoce como \textit{problemas de regresión} \cite{bishop2006pattern}. 
     \item Por otro lado, tenemos el \textbf{Aprendizaje No Supervisado} cuando el conjunto de datos de entrenamiento consiste en \textit{datos no etiquetados} --ejemplos de vectores de entrada $\mathbf{x}$ sin sus correspondientes etiquetas de salida-- \cite{bishop2006pattern}. En este caso, el objetivo puede ser encontrar grupos de ejemplos similares en los datos, \textit{clustering}; determinar la distribución de los datos en el espacio de entrada, \textit{density estimation}; o proyectar los datos de un espacio de alta dimensión a uno más sencillo, \textit{dimensionality reduction} \cite{bishop2006pattern}.
-    \item Además de estas dos categorías, existe una tercera gran categoría el \textbf{Aprendizaje por Refuerzo}. Este a diferencia de los anteriores, donde se toma un conjunto de entrenamiento estatico, se basa en la idea de que el algoritmo de aprendizaje interactue activamente con el entorno, recibiendo recompensas inmediatas por cada acción tomada. El objetivo en este tipo de aprendizaje es maximizar la recompensa a lo largo de un curso de interacciones con el entorno \cite{mohri2018foundations}.
+    \item Además de estas dos categorías, existe una tercera gran categoría, el \textbf{Aprendizaje por Refuerzo}. Este, a diferencia de los anteriores donde se toma un conjunto de entrenamiento estático, se basa en la idea de que el algoritmo de aprendizaje interactúe activamente con el entorno, recibiendo recompensas inmediatas por cada acción tomada. El objetivo en este tipo de aprendizaje es maximizar la recompensa a lo largo de un curso de interacciones con el entorno \cite{mohri2018foundations}.
 
 \end{itemize}
 
-Sin embargo, en este trabajo no nos vamos a centrar en una de estas grandes ramas del aprendizaje computacional, si no que vamos a tratar un tipo de aprendizaje que se encuentra a medio camino entre los tipos de aprendizaje estaticos vistos. El \textbf{Aprendizaje Semi-Supervisado}, la rama del aprendizaje computacional que usa tanto datos etiquetados como no etiquetados para realizar distintas tareas de aprendizaje \cite{van2020survey}. 
+Sin embargo, en este trabajo no nos vamos a centrar en una de estas grandes ramas del aprendizaje computacional, sino que vamos a tratar un tipo de aprendizaje que se encuentra a medio camino entre los tipos de aprendizaje estáticos vistos. El \textbf{Aprendizaje Semi-Supervisado}, la rama del aprendizaje computacional que usa tanto datos etiquetados como no etiquetados para realizar distintas tareas de aprendizaje \cite{van2020survey}. 
 
 Aun así, esta definición de aprendizaje semi-supervisado es demasiado general para los objetivos de este trabajo, es por esto que se va a tomar el enfoque propuesto en \textit{A taxonomy for semi-supervised learning methods, Seeger, 2006} \cite{seeger2006taxonomy}, donde se considera al \textbf{aprendizaje semi-supervisado} como una extensión del aprendizaje supervisado que se beneficia de la presencia de datos no etiquetados. De manera complementaria, se denomina \textbf{aprendizaje semi-no-supervisado} a las tareas de aprendizaje no supervisado que se benefician de la presencia de datos etiquetados, que quedan fuera del alcance de este trabajo.
 
@@ -28,12 +28,13 @@ Finalmente, destacar que dentro del aprendizaje semi-supervisado, al ser este un
 \section{Estructura del trabajo}
 \label{sec:estructura}
 
-Una vez realizada esta introducción, finalizamos este capitulo presentando la estructura con la que se ha organizado el resto del trabajo: 
+Una vez realizada esta introducción, finalizamos este capítulo presentando la estructura con la que se ha organizado el resto del trabajo: 
 
 \begin{itemize}
     \item En el capítulo 2 se presenta formalmente el aprendizaje semi-supervisado, definiendo los conceptos básicos y presentando las diferentes suposiciones que se hacen sobre los datos para que el aprendizaje semi-supervisado pueda ser efectivo.
     \item En el capítulo 3 se exponen diferentes maneras de organizar los algoritmos de aprendizaje semi-supervisado, para concluir presentando una taxonomía de los mismos.
     \item En el capítulo 4 se procede entonces a realizar un estudio teórico de los métodos envolventes y sus diferentes variantes.
     \item En el capítulo 5 se presentan los métodos basados en preprocesamiento de los datos no etiquetados.
-    \item En el capítulo 6 se presentan los métodos intrinsecamente semi-supervisados. 
+    \item En el capítulo 6 se presentan los métodos intrínsecamente semi-supervisados.
+    \item Finalmente, en el capítulo 7 se presentan las conclusiones del trabajo y se proponen posibles líneas de investigación futuras. 
 \end{itemize}
