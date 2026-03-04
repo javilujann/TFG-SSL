@@ -1,0 +1,96 @@
+\chapter{Metodos envolventes}
+% En este capítulo vamos a proceder con el desarrollo teórico de los diferentes métodos o familias de métodos que se han presentado en la taxonomía. En cada sección se hará una breve introducción a la categoría dentro de la taxonomía, recordando sus aspectos principales que la diferencian de las demás, y posteriormente se hará una un estudio de los métodos más representativos de cada categoría, explicando su funcionamiento.
+La familia de métodos envolventes es de las más viejas y ampliamente conocidas dentro del aprendizaje semi-supervisado \cite{zhou2010semi}. Como se ha explicado a la hora de presentar esta categoría en la taxonomía (Sección \ref{sec:div-uso-etiquetas}), estos métodos se basan en la idea del \textit{pseudoetiquetado}, un procedimiento iterativo donde cada iteración consiste en dos pasos: primero se entrena a uno o varios clasificadores supervisados con los datos etiquetados originales y posiblemente con datos etiquetados de iteraciones anteriores, y luego se utilizan estos clasificadores para predecir etiquetas para los datos no etiquetados, las predicciones de mayor confianza son entonces añadidas al conjunto de datos etiquetados, conviertiendose en datos pseudoetiquetados. Este proceso se repite hasta que se cumpla un criterio de parada, como por ejemplo un número máximo de iteraciones o una mejora mínima en el rendimiento del modelo.
+
+Esta familia de métodos tiene varias peculiaridades que vamos a exponer a continuación:
+
+\begin{itemize}
+    \item En primer lugar, tienen una propiedad clave que es la de poder ser aplicados a cualquier, o casi cualquier, modelo supervisado subyacente. Esto les otorga de una gran flexibilidad pues introducen el uso de los datos no etiquetados en el proceso de entrenamiento de manera sencilla y directa. 
+    \item Por otro lado, cabe recalcar que no se basan por si mismos en ningún supuesto específico sobre la distrbución de los datos o las relaciones entre los datos etiquetados y no etiquetados, si no que dependen de los supuestos que tengan los modelos supervisados subyacentes. Esto les otroga gran versatilidad, y los convierte en candidatos idoneos para mejorar el rendimiento en problemas en los que algún algoritmo supervisado ya trabaja bien. 
+    \item Sin embargo tienen una suposición importante: los métodos envolventes asumen que las predicciones, al menos la de mayor confianza, son correctas. En el caso de que esto no se cumpla, se puede producir un efecto de arrastre donde los errores se van acumulando a lo largo de las iteraciones, lo que puede resultar en una degradación del rendimiento del modelo \cite{zhu2009introduction}.
+\end{itemize}
+
+Se van a presentar a continuación tres métodos o familias de métodos representativas de los métodos envolventes: el auto-entrenamiento, los métodos basados en desacuerdo y los métodos basados en boosting.
+
+\section{Auto-entrenamiento}
+
+El auto-entrenamiento es la versión más simple de los métodos envolventes y una de las más antiguas \cite{yarowsky1995unsupervised}. En este método se toma la idea del pseudoetiquetado y se aplica a un único clasificador supervisado, que se entrena con los datos etiquetados originales y luego se utiliza para predecir etiquetas para los datos no etiquetados, usando las predicciones de mayor confianza reforzar el entrenamiento en la siguiente iteración.
+
+A pesar de su simplicidad, se pueden realizar varias decisiones de diseño a la hora de implementar un método de auto-entrenamiento: el criterio para seleccionar las predicciones de mayor confianza, el número de predicciones a añadir en cada iteración o el criterio de parada. Estas decisiones pueden tener un impacto significativo en el rendimiento del método y pueden ser adaptadas a las características específicas del problema y los datos \cite{van2020survey}.
+
+Se expone a continuación un algortitmo de auto-entrenamiento donde se pueden observar estas decisiones de diseño:
+
+\begin{algo}
+    \textbf{Auto-entrenamiento}
+    \\Entrada: Conjunto de datos etiquetados $L = \{(\mathbf{x}_i, y_i)\}_{i=1}^l$, conjunto de datos no etiquetados $U = \{\mathbf{x}_j\}_{j=l+1}^{l+u}$, clasificador supervisado $f$, criterio de selección de predicciones de mayor confianza $C$, criterio de parada $S$.
+    \\Salida: Clasificador entrenado $f$.
+    \\Procedimiento:
+    \\Mientras no se cumpla el criterio de parada $S$:
+    \begin{enumerate}
+        \item Entrenar el clasificador supervisado $f$ con los datos etiquetados $L$.
+        \item Predecir etiquetas para los datos no etiquetados $U$ utilizando el clasificador supervisado $f$, obteniendo un conjunto de predicciones $P$.
+        \item Seleccionar un subconjunto de predicciones $P_{conf}$ de $P$ utilizando el criterio de selección de predicciones de mayor confianza $C$.
+        \item Añadir las predicciones seleccionadas $P_{conf}$ al conjunto de datos etiquetados $L$, convirtiéndolas en datos pseudoetiquetados.
+        \item Eliminar las predicciones seleccionadas $P_{conf}$ del conjunto de datos no etiquetados $U$.
+    \end{enumerate}
+\end{algo}
+
+\section{basados en desacuerdo}
+
+Los métodos basados en desacuerdo son la extensión natural del auto-entrenamiento a múltiples clasificadores supervisados. Su nombre proviene del hecho de que en cada iteración del pseudoetiquetado, una vez entrenados los clasificadores supervisados, estos no necesariamente estan de acuerdo en sus predicciones para los datos no etiquetados, y se pueden aprovechar estas diferencias para seleccionar las predicciones que se van a añadir al conjunto de datos etiquetados. Por ejemplo, se pueden seleccionar las predicciones donde los clasificadores están de acuerdo, o por el contrario, predicciones donde algun clasificador tiene mucha confianza en su predicción, dependiendo de la estrategia que se quiera seguir \cite{zhou2010semi}.
+
+Los métodos basados en desacuerdo utilizan los datos no etiquetados como una especie de puente para intercambiar información entre los modelos a entrenar. El origen de esta discrepancia en la información y la manera en la que esta es propagada divide estos métodos en varias familias que se presentan a continuación.
+
+\subsection{Multiples vistas}
+
+Una de las primeras ideas que dieron forma a este tipo de métodos fue la de descomponer el dominio de las instancias $\mathcal{X}$ en lo que se conoce como vistas, es decir, subconjuntos disjuntos de las características, y entrenar un clasificador supervisado para cada vista, de esta manera cada clasificador tiene una información diferente sobre el problema y se pueden aprovechar estas diferencias para mejorar el rendimiento del modelo \cite{zhou2010semi}. 
+
+El primero método de este tipo fue el co-training presentado en \textit{Combining labeled and unlabeled data with co-training, Blum and Mitchell, 1998} \cite{blum1998combining} donde se divide el dominio en dos vistas $\mathcal{X} = \mathcal{X}_1 \cup \mathcal{X}_2$ de tal manera que cada vector de características $\mathbf{x}$ se puede representar como $\mathbf{x} = (\mathbf{x}_1, \mathbf{x}_2)$ con $\mathbf{x}_1 \in \mathcal{X}_1$ y $\mathbf{x}_2 \in \mathcal{X}_2$. El algoritmo de co-training consiste en entrenar dos clasificadores supervisados $f_1$ y $f_2$ con las vistas $\mathcal{X}_1$ y $\mathcal{X}_2$ respectivamente, y luego utilizar cada clasificador para predecir etiquetas para los datos no etiquetados, añadiendo las predicciones de mayor confianza de cada clasificador al conjunto de datos etiquetados del otro clasificador. Este proceso se repite iterativamente hasta que se cumpla un criterio de parada.
+
+Blum y Mitchell hacen dos suposiciones clave para que co-training funcione correctamente: la primera es que las vistas son condicionalmente independientes dado la etiqueta, es decir, $P(\mathbf{x}_1, \mathbf{x}_2 \mid y) = P(\mathbf{x}_1 \mid y) P(\mathbf{x}_2 \mid y)$, lo que implica que cada vista proporciona información complementaria sobre la etiqueta. La segunda suposición es que cada vista es suficiente para predecir la etiqueta, es decir, $P(y \mid \mathbf{x}_1) = P(y \mid \mathbf{x}_2) = P(y \mid \mathbf{x})$, lo que implica que cada vista por si sola es capaz de predecir la etiqueta con un rendimiento razonable \cite{zhu2009introduction}. 
+
+Sin embargo, se ha desmostrado que el los métodos de multiples vistas pueden funcionar con suposiciones más débiles en la independencia \cite{abney2002bootstrapping}. Por ejemplo, la suposición de expansión \cite{balcan2004co} relaja la independencia condicional, exigiendo simplemente que los ejemplos no estén excesivamente correlacionados y que el clasificador no cometa errores con alta confianza. Desde un punto de vista de teoría de aprendizaje, esto garantiza que el error de generalización se reduce al forzar el acuerdo entre las vistas.
+
+\subsection{Una única vista}
+
+Sin embargo, hay una suposición aun mayor en co-training y los métodos basados en multiples vistas, y es que en muchos casos del mundo real no existe una división natural del dominio en vistas. Es aquí donde surgen los métodos de una única vista, estos buscan generar múltiples clasificadores supervisados a partir de un dominio que en su origen no tiene una división en vistas.
+
+Una primera idea puede ser la de generar las vistas artificialmente, y usar estas vistas para entrenar los diferentes clasificadores supervisados \cite{wang2008random}. Otras formas más naturales de entrenar múltiples clasificadores supervisados con una única vista, pero introduciendo alguna fuente de aleatoriedad para que cada clasificador tenga una información diferente sobre el problema, pueden ser utilizar diferentes parametros para un mismo modelo \cite{wang2007analyzing} o utilizar directamente diferentes modelos supervisados \cite{Goldman2000EnhancingSL}.
+
+\subsection{Co-regularización}
+
+Una ultima idea, dentro de los métodos envolventes basados en desacuerdo, pero algo alejada del concepto del psuodoetiquetado, es la de \textbf{co-regularización}. Al igual que en los métodos anteriores se entrenan diferentes clasificadores, sin embargo aqui el pseoudoetiquetado no es un proceso iterativo, si no que se introduce un término de regularización en la función de pérdida de cada clasificador que penaliza el desacuerdo entre los clasificadores en sus predicciones para los datos no etiquetados, de esta manera se fuerza a los clasificadores a estar de acuerdo en sus predicciones para los datos no etiquetados, lo que puede mejorar el rendimiento del modelo \cite{sindhwani2008rkhs}.
+
+Veamos que quiere decir esto, para ello tenemos que definir el concepto de función de pérdida. En el aprendizaje supervisado, la función de pérdida es una medida de la discrepancia entre las predicciones del modelo y las etiquetas reales de los datos etiquetados, y se utiliza para guiar el proceso de entrenamiento del modelo:
+
+\begin{defi}
+    Bajo el marco del aprendizaje supervisado, sea $\mathbf{x} \in \mathcal{X}$ un vector de características, $y \in \mathcal{Y}$ su etiqueta correspondiente, y $f: \mathcal{X} \rightarrow \mathcal{Y}$ un modelo supervisado, se define la función de pérdida $L: \mathcal{Y} \times \mathcal{Y} \rightarrow \mathbb{R}$ como una función que mide la discrepancia entre la predicción del modelo $f(\mathbf{x})$ y la etiqueta real $y$, es decir, $L(f(\mathbf{x}), y)$ representa el costo o penalización por predecir $f(\mathbf{x})$ cuando la etiqueta real es $y$.
+\end{defi}
+
+Una posible idea que surge a partir de la función de pérdida es la de buscar un modelo que minimice la función de pérdida en el conjunto de datos etiquetados, es decir, encontrar un modelo $f$ que minimice la siguiente expresión:
+
+\begin{equation}
+    \sum_{i=1}^{l} L(f(\mathbf{x}_i), y_i)
+\end{equation}
+
+Sin embargo, estos modelos tienden a sobreajustar los datos etiquetados, perdiendo asi capacidad de generalización, para evitar esto surge el marco de la \textit{regularización} en el cual se introduce un término de regularización en la función de pérdida que penaliza la complejidad del modelo, de esta manera se busca un modelo que minimice la siguiente expresión:
+
+\begin{equation}
+    \sum_{i=1}^{l} L(f(\mathbf{x}_i), y_i) + \lambda \Omega(f)
+\end{equation}
+
+Dentro de este marco de regularización, se encuentra la idea de co-regularización, donde se introduce un término de regularización compuesto por la suma de un término de pérdida para cada clasificador supervisado y un término de regularización que penaliza el desacuerdo entre los clasificadores en sus predicciones para los datos no etiquetados, es decir, se busca un conjunto de clasificadores $f_1, f_2, \ldots, f_k$ que minimice la siguiente expresión:
+
+\begin{equation}
+    \sum_{u=1}^{k} \left(\sum_{i=1}^{l} L(f_u(\mathbf{x}_i), y_i) + \lambda \Omega(f_u) \right) + \gamma \sum_{u,v=1}^{k} \sum_{i=l+1}^{l+u} L(f_u(\mathbf{x}_i), f_v(\mathbf{x}_i))
+\end{equation}
+
+Este último término del sumatorio representa ese pseudoetiquetado, las etiquetas generadas por cada clasificador para los datos no etiquetados se utilizan para entrenar a los otros clasificadores en cada iteración, todo mientras se busca minimizar el desacuerdo entre los clasificadores en sus predicciones para los datos no etiquetados.
+
+Destacar que aunque la co-regularización no se basa en un proceso iterativo de pseudoetiquetado, y aunque haya aparecido una función de pérdida que se minimiza, sigue siendo un método envolvente basado en desacuerdo, pues se siguen entrenando diferentes clasificadores supervisados con la información de los datos no etiquetados, y se sigue buscando aprovechar las diferencias entre los clasificadores para mejorar el rendimiento del modelo.
+
+\section{Boosting}
+
+Una última familia de métodos envolventes son aquellos que se basan en la idea del boosting. El boosting es una técnica de aprendizaje supervisado que se encuentra en el marco de los métodos de ensamblado, los cuales se basan en la idea de entrenar múltiples modelos supervisados y luego combinar sus predicciones para obtener una predicción final. El boosting se diferencia de otros métodos de ensamblado en que los modelos supervisados se entrenan de manera secuencial, cada modelo se entrena para corregir los errores del modelo anterior, lo que puede mejorar el rendimiento del modelo \cite{zhou2025ensemble}.
+
+En el contexto del aprendizaje semi-supervisado se han desarrollado varios métodos basados en el boosting, pues permiten introducir una etapa de pseudoetiquetado tras cada entrenamiento. El precursos de estos modelos fue SSMBoost \cite{grandvalet2001boosting}, sin embargo, este método se basa en usar un algoritmo semi-supervisado de base, no en introducir el pseudoetiquetado tras cada entrenamiento, por lo que al no actuar de caja negra no es realmente un método envolvente. Posteriormente, se han desarrollado otros métodos basados en el boosting que si introducen el pseudoetiquetado tras cada entrenamiento, como por ejemplo Asssemble \cite{bennett2002exploiting} o SemiBoost \cite{mallapragada2008semiboost}, ambos se diferencian en la forma de introducir el pseudoetiquetado en la siguiente iteración. Assemble toma un enfoque más directo pues hace una selección aleatoria con remplazamiento (\textit{bootstraping}) sobre el conjunto formado por los datos etiquetados y pseudoetiquetados para generar el conjunto de datos etiquetados para la siguiente iteración. Por otro lado en SemiBoost se seleccionan las predicciones de mayor confianza para generar el conjunto de datos etiquetados para la siguiente iteración, la confianza de cada predicción individual se calcula usando un grafo local construido mediante similitud entre los datos de entrada.
