@@ -1,6 +1,6 @@
 \chapter{Introducción al Aprendizaje Semi-Supervisado}
 
-En este capítulo se da un enfoque formal a los conceptos introducidos en el capítulo anterior. En la sección \ref{sec:problema_clasificacion} se presenta una definición formal de la clasificación semi-supervisada, el concepto sobre el que se articula el trabajo. Posteriormente, en la sección \ref{sec:suposiciones}, se presentan las suposiciones que hay detrás del aprendizaje semi-supervisado, y que son necesarias para entender cómo este puede obtener mejor rendimiento que el aprendizaje supervisado, y cuando es así.
+En este capítulo se da un enfoque formal a los conceptos introducidos en el capítulo anterior. En la sección \ref{sec:problema_clasificacion} se presenta una definición formal de la clasificación semi-supervisada, el concepto sobre el que se articula el trabajo. Posteriormente, en la sección \ref{sec:suposiciones}, se presentan las suposiciones que hay detrás del aprendizaje semi-supervisado, y que son necesarias para entender cómo este puede obtener mejor rendimiento que el aprendizaje supervisado, y cuándo es así.
 
 \section{Problema de clasificación semi-supervisado}
 \label{sec:problema_clasificacion}
@@ -30,32 +30,98 @@ Se asume típicamente que hay muchos más datos no etiquetados que etiquetados, 
 \end{rema}
 
 \begin{rema}
-Al tratarse del problema de clasificacion el dominio de las etiquetas $\mathcal{Y}$ es un conjunto discreto. Si fuera continuo estariamos hablando de un problema de regresión semi-supervisada que queda fuera del alcance de este trabajo.
+Al tratarse del problema de clasificación, el dominio de las etiquetas $\mathcal{Y}$ es un conjunto discreto. Si fuera continuo, estaríamos hablando de un problema de regresión semi-supervisada que queda fuera del alcance de este trabajo.
 \end{rema}
 
-Con estas definiciones, queda establecido el marco teórico sobre el que se desarrolla este trabajo. Antes de cerrar este capítulo, se explicará por qué y bajo qué condiciones el aprendizaje semi-supervisado puede superar al aprendizaje supervisado. A partir de ahí, en los capítulos siguientes se presentará una taxonomía de los métodos de clasificación semi-supervisada y se analizarán en detalle los enfoques más relevantes.
+Con estas definiciones, queda establecido el problema sobre el que se articula este trabajo. En la siguiente sección se introducen los conceptos de función de pérdida y regularización, herramientas fundamentales para formalizar el proceso de aprendizaje. Posteriormente, en la sección \ref{sec:suposiciones}, se explicará por qué y bajo qué condiciones el aprendizaje semi-supervisado puede superar al aprendizaje supervisado.
+
+\section{Funciones de pérdida y regularización}
+\label{sec:perdida_regularizacion}
+
+Una vez definido el problema de clasificación semi-supervisada, es necesario introducir los conceptos fundamentales que permiten formalizar el proceso de aprendizaje. En particular, se necesita un mecanismo para medir la calidad de las predicciones de un clasificador y un criterio para seleccionar el mejor clasificador dentro de una familia dada. Las definiciones que se presentan a continuación se basan en las formulaciones de \textit{Introduction to Semi-Supervised Learning, Zhu y Goldberg, 2009} \cite{zhu2009introduction} y \textit{Foundations of Machine Learning, Mohri et al., 2018} \cite{mohri2018foundations}.
+
+\begin{defi}[Función de pérdida]
+\label{def:perdida}
+Sea $\mathcal{X}$ el dominio de las instancias, $\mathcal{Y}$ el dominio de las etiquetas y $f: \mathcal{X} \to \mathcal{Y}$ un clasificador. Una \textbf{función de pérdida} es una función $c: \mathcal{X} \times \mathcal{Y} \times \mathcal{Y} \to \mathbb{R}_{\geq 0}$ que mide el coste de predecir $f(\mathbf{x})$ cuando la etiqueta real es $y$. Se denota $c(\mathbf{x}, y, f(\mathbf{x}))$.
+\end{defi}
+
+\begin{example}
+En problemas de clasificación, una función de pérdida habitual es la \textbf{pérdida 0-1}, definida como $c(\mathbf{x}, y, f(\mathbf{x})) = \mathbf{1}_{f(\mathbf{x}) \neq y}$, que asigna coste 1 si la predicción es incorrecta y 0 en caso contrario.
+\end{example}
+
+Una vez establecida la noción de pérdida individual, se puede definir una medida global del rendimiento del clasificador:
+
+\begin{defi}[Riesgo]
+\label{def:riesgo}
+Dado un clasificador $f \in \mathcal{F}$ y una función de pérdida $c$, el \textbf{riesgo} o \textbf{error de generalización} de $f$ se define como la pérdida esperada bajo la distribución conjunta $P(\mathbf{x}, y)$:
+$$R(f) = \mathbb{E}_{(\mathbf{x},y) \sim P}\left[c(\mathbf{x}, y, f(\mathbf{x}))\right]$$
+El clasificador óptimo es aquel que minimiza el riesgo: $f^* = \arg\min_{f \in \mathcal{F}} R(f)$ \cite{zhu2009introduction}.
+\end{defi}
+
+\begin{rema}
+El riesgo $R(f)$ no se puede calcular directamente, puesto que la distribución $P(\mathbf{x}, y)$ es desconocida. Es por esto que se recurre a una aproximación basada en los datos disponibles.
+\end{rema}
+
+\begin{defi}[Riesgo empírico]
+\label{def:riesgo_empirico}
+Dado un conjunto de entrenamiento etiquetado $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$, el \textbf{riesgo empírico} de un clasificador $f$ se define como:
+$$\hat{R}(f) = \frac{1}{l}\sum_{i=1}^{l} c(\mathbf{x}_i, y_i, f(\mathbf{x}_i))$$
+\end{defi}
+
+\begin{rema}
+El riesgo empírico es un estimador insesgado del riesgo real, es decir, $\mathbb{E}[\hat{R}(f)] = R(f)$ \cite{mohri2018foundations}. Esto justifica su uso como aproximación del riesgo verdadero.
+\end{rema}
+
+El principio de \textbf{minimización del riesgo empírico} (ERM, por sus siglas en inglés) propone seleccionar el clasificador que minimice esta cantidad:
+\begin{equation}
+\label{eq:erm}
+    f_{\text{ERM}} = \arg\min_{f \in \mathcal{F}} \hat{R}(f)
+\end{equation}
+
+Sin embargo, este principio tiende a producir modelos que se \textit{sobreajustan} a los datos de entrenamiento, es decir, que memorizan las particularidades del conjunto de entrenamiento perdiendo capacidad de generalización a datos nuevos \cite{mohri2018foundations}. Para mitigar este problema, se introduce un término adicional que penaliza la complejidad del clasificador, dando lugar al marco de \textbf{minimización del riesgo regularizado}:
+
+\begin{defi}[Minimización del riesgo regularizado]
+\label{def:riesgo_regularizado}
+Dada una función de pérdida $c$, un funcional de regularización $\Omega: \mathcal{F} \to \mathbb{R}_{\geq 0}$ que mide la complejidad del modelo, y un parámetro de regularización $\lambda > 0$, el problema de minimización del riesgo regularizado consiste en encontrar:
+\begin{equation}
+\label{eq:riesgo_regularizado}
+    f^* = \arg\min_{f \in \mathcal{F}} \left[ \hat{R}(f) + \lambda\, \Omega(f) \right] = \arg\min_{f \in \mathcal{F}} \left[ \frac{1}{l}\sum_{i=1}^{l} c(\mathbf{x}_i, y_i, f(\mathbf{x}_i)) + \lambda\, \Omega(f) \right]
+\end{equation}
+\end{defi}
+
+Este marco es de gran utilidad tanto para comprender las suposiciones del aprendizaje semi-supervisado como para formalizar los métodos que se presentarán en capítulos posteriores. En particular, en el contexto semi-supervisado, el funcional de regularización puede incorporar información de los datos no etiquetados, adoptando la forma $\Omega(f) = \Omega_{\text{sup}}(f) + \lambda'\, \Omega_{\text{ssl}}(f)$, donde $\Omega_{\text{sup}}$ es un regularizador estándar y $\Omega_{\text{ssl}}$ es un término que codifica información sobre la estructura de $P(\mathbf{x})$, estimada a partir de los datos no etiquetados \cite{zhu2009introduction}.
 
 \section{Suposiciones del aprendizaje semi-supervisado}
 \label{sec:suposiciones}
 
-Aunque no todos los métodos de aprendizaje semi-supervisado se basan explícitamente en probabilidades, resulta útil para entender cómo el aprendizaje semi-supervisado puede obtener mejor rendimiento que el aprendizaje supervisado, asumir que los métodos representan las hipótesis como $p(y \mid x)$ y los datos no etiquetados como $p(x)$. De esta manera, la información que proporciona $p(x)$ se puede introducir de dos posibles formas: o bien en modelos que estiman la distribución conjunta $p(x,y)$ que comparte parámetros con $p(x)$, o bien modificando la función objetivo para incluir términos de $p(x)$ \cite{zhu2005semi}.
+Aunque no todos los métodos de aprendizaje semi-supervisado se basan explícitamente en probabilidades, resulta útil para entender cómo el aprendizaje semi-supervisado puede obtener mejor rendimiento que el aprendizaje supervisado, asumir que los métodos representan las hipótesis como $p(y \mid \mathbf{x})$ y los datos no etiquetados como $p(\mathbf{x})$. La clave para entender el papel de los datos no etiquetados reside en la descomposición de la distribución conjunta:
+$$p(\mathbf{x}, y) = p(y \mid \mathbf{x})\, p(\mathbf{x})$$
 
-Sin embargo, para que el conocimiento sobre la distribución de los datos de entrada $p(x)$ sea útil para inferir la etiqueta de salida $p(y \mid x)$, debe existir una relación estructural entre ambas. Es por esto que detrás de cada método de aprendizaje semi-supervisado hay una serie de suposiciones sobre cómo estas distribuciones se relacionan entre sí. Pero, antes de exponer estas suposiciones, conviene clarificar algunos conceptos fundamentales sobre la geometría de los datos:
+En el aprendizaje supervisado, el objetivo es estimar $p(y \mid \mathbf{x})$, y la distribución marginal $p(\mathbf{x})$ no aporta información adicional directa sobre $p(y \mid \mathbf{x})$. Sin embargo, en el aprendizaje semi-supervisado, la información que proporcionan los datos no etiquetados sobre $p(\mathbf{x})$ se puede aprovechar de dos posibles formas: o bien a través de modelos generativos que estiman la distribución conjunta $p(\mathbf{x},y)$, la cual comparte parámetros con $p(\mathbf{x})$; o bien modificando la función objetivo (por ejemplo, el funcional de regularización $\Omega_{\text{ssl}}$ de la Sección \ref{sec:perdida_regularizacion}) para incorporar términos que dependan de $p(\mathbf{x})$ \cite{zhu2005semi}.
 
-\begin{itemize}
-\item \textbf{Densidad:} Se refiere a la concentración de puntos en una región determinada del dominio de las instancias $\mathcal{X}$. Las regiones de alta densidad son aquellas donde el valor de $P(x)$ es alto, mientras que las de baja densidad tienen un valor bajo.
-\item \textbf{Clúster:} Conjunto formado por una serie de puntos que, bajo una cierta distancia, se encuentran significativamente más cerca entre sí que del resto de los datos \cite{bishop2006pattern}.
-\item \textbf{Frontera de decisión:} Es la superficie o hiperplano que divide el espacio de entrada $\mathcal{X}$ en regiones que se corresponden a diferentes categorías o clases \cite{bishop2006pattern}.
-\item \textbf{Variedad (Manifold):} Se refiere a una estructura topológica de baja dimensión que se encuentra sumergida en un espacio de dimensión mayor.
-\end{itemize}
-
-Una vez presentados estos conceptos, se pueden entonces exponer cuáles son las suposiciones tal y como se presentan en \textit{Semi-supervised learning, Chapelle et al., 2006} \cite{10.7551/mitpress/9780262033589.001.0001}:
+No obstante, para que el conocimiento sobre $p(\mathbf{x})$ sea realmente útil para inferir $p(y \mid \mathbf{x})$, debe existir una relación estructural entre ambas distribuciones. Es por esto que detrás de cada método de aprendizaje semi-supervisado hay una serie de suposiciones sobre cómo estas distribuciones se relacionan entre sí. Pero, antes de exponer estas suposiciones, conviene clarificar algunos conceptos fundamentales sobre la geometría de los datos:
 
 \begin{itemize}
-    \item \textbf{Suposición de suavidad}: Si dos puntos $x_1$ y $x_2$ en una región de alta densidad están cerca, entonces también deben estarlo sus correspondientes salidas $y_1$ y $y_2$. 
-    \item \textbf{Suposición de clústers}: Si los puntos se encuentran en un mismo clúster, es probable que tengan la misma etiqueta. 
-    \item \textbf{Suposición de baja densidad}: La frontera de decisión debe pasar por regiones de baja densidad. Esta suposición es una reformulación de la suposición de clústers pues si los puntos de un mismo clúster tienen la misma etiqueta, entonces la frontera de decisión debe pasar por regiones de baja densidad donde no haya clústers.
-    \item \textbf{Suposición de variedad subyacente}: Los datos se encuentran (aproximadamente) en una variedad de baja dimensión dentro de la representación de alta dimensión del espacio de entrada $\mathcal{X}.$
+\item \textbf{Densidad:} Se refiere a la concentración de puntos en una región determinada del dominio de las instancias $\mathcal{X}$. Formalmente, las regiones de alta densidad son aquellas donde el valor de la función de densidad de probabilidad $p(\mathbf{x})$ es elevado, mientras que las de baja densidad corresponden a valores reducidos de $p(\mathbf{x})$.
+\item \textbf{Clúster:}  De manera intuitiva, un clúster es un conjunto de puntos que, bajo una cierta métrica, se encuentran significativamente más cerca entre sí que del resto de los datos \cite{bishop2006pattern}.
+\item \textbf{Frontera de decisión:} Es la superficie o hipersuperficie en el espacio de entrada $\mathcal{X}$ que separa las regiones asignadas a diferentes clases por un clasificador $f$ \cite{bishop2006pattern}.
+\item \textbf{Variedad (\textit{manifold}):} Un espacio topológico $\mathcal{M}$ que es localmente homeomorfo a $\mathbb{R}^d$, es decir, para cada punto $p \in \mathcal{M}$ existe un entorno abierto $U \text{ tal que } p \in U$ y un homeomorfismo $\varphi: U \to V \subseteq \mathbb{R}^d$. En el contexto de este trabajo, se considera que los datos residen en (o cerca de) una variedad $\mathcal{M}$ de dimensión $d$ sumergida en el espacio de entrada $\mathcal{X} \subseteq \mathbb{R}^D$ con $d \ll D$ \cite{10.7551/mitpress/9780262033589.001.0001}.
 \end{itemize}
 
-Destacar que si la suposición en la que se basa un metodo de aprendizaje semi-supervisado no se cumple, el uso de datos no etiquetados puede ser contraproducente y empeorar el rendimiento respecto al aprendizaje supervisado \cite{zhu2009introduction}.
+Una vez presentados estos conceptos, se pueden entonces exponer cuáles son las suposiciones que permiten que los datos no etiquetados aporten información útil. Estas suposiciones se presentan tal y como aparecen en \textit{Semi-supervised learning, Chapelle et al., 2006} \cite{10.7551/mitpress/9780262033589.001.0001}:
+
+\begin{itemize}
+    \item \textbf{Suposición de suavidad (semi-supervisada)}: Si dos puntos $\mathbf{x}_1$ y $\mathbf{x}_2$ se encuentran en una región de alta densidad de $p(\mathbf{x})$ y están cercanos entre sí, entonces sus correspondientes salidas $y_1$ e $y_2$ también deben estarlo. Nótese la diferencia con la suposición de suavidad clásica del aprendizaje supervisado, que simplemente requiere que puntos cercanos tengan salidas cercanas: aquí la suavidad está modulada por la densidad, lo que significa que la función de predicción puede cambiar abruptamente en regiones de baja densidad.
+    
+    \item \textbf{Suposición de clústers}: Si dos puntos $\mathbf{x}_1$ y $\mathbf{x}_2$ pertenecen a un mismo clúster de $p(\mathbf{x})$, es probable que compartan la misma etiqueta, es decir, $p(y \mid \mathbf{x}_1) \approx p(y \mid \mathbf{x}_2)$. Bajo esta suposición, los datos no etiquetados, al revelar la estructura de clústers de $p(\mathbf{x})$, proporcionan información sobre las fronteras entre clases.
+    
+    \item \textbf{Suposición de baja densidad}: La frontera de decisión del clasificador debe pasar por regiones de baja densidad de $p(\mathbf{x})$. Esta suposición es, de hecho, una reformulación equivalente de la suposición de clústers: si los puntos de un mismo clúster comparten etiqueta, entonces las fronteras entre clases necesariamente se hallan en las regiones de baja densidad que separan los clústers.
+    
+    \item \textbf{Suposición de variedad subyacente}: Los datos se encuentran (aproximadamente) en una variedad $\mathcal{M}$ de dimensión $d \ll D$ dentro de la representación de alta dimensión del espacio de entrada $\mathcal{X} \subseteq \mathbb{R}^D$. Esta suposición permite reducir la \textit{maldición de la dimensionalidad}: en lugar de trabajar en el espacio ambiente $\mathbb{R}^D$, las distancias y relaciones entre puntos se pueden calcular sobre la variedad $\mathcal{M}$, donde la dimensión intrínseca $d$ es mucho menor \cite{10.7551/mitpress/9780262033589.001.0001}. Los datos no etiquetados, al ser abundantes, permiten estimar mejor la geometría de $\mathcal{M}$.
+\end{itemize}
+
+\begin{rema}
+Las suposiciones de clústers y de baja densidad, aunque equivalentes desde un punto de vista teórico, sugieren diferentes estrategias algorítmicas. La suposición de clústers lleva naturalmente a métodos que primero identifican la estructura de los datos (como los basados en grafos), mientras que la suposición de baja densidad sugiere métodos que buscan directamente fronteras de decisión en regiones de baja densidad (como los métodos de máximo margen).
+\end{rema}
+
+Destacar que si la suposición en la que se basa un método de aprendizaje semi-supervisado no se cumple, el uso de datos no etiquetados puede ser contraproducente y empeorar el rendimiento respecto al aprendizaje supervisado \cite{zhu2009introduction}. Este fenómeno, conocido informalmente como \textit{degradación del rendimiento}, subraya la importancia de verificar o al menos controlar la validez de las suposiciones a la hora de aplicar un método semi-supervisado a un problema concreto.
