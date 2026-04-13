@@ -1,0 +1,82 @@
+\chapter{Métodos intrínsecamente semi-supervisados}
+
+Pasamos ahora en este capítulo a describir los métodos intrínsecamente semi-supervisados, es decir, aquellos que desde su concepción están diseñados para tratar tanto con datos etiquetados como con datos no etiquetados.
+
+\section{Generativos}
+
+Métodos generativos
+
+\section{Discriminativos}
+
+a
+
+\subsection{Máximo margen}
+\label{subsec:maximo_margen}
+
+Los métodos de máximo margen buscan aprender una frontera de decisión que quede lo más alejada posible de los ejemplos de entrenamiento. En el caso de clasificación binaria, esto suele formularse como la maximización del margen geométrico del clasificador \cite{van2020survey}. En aprendizaje semi-supervisado, esta idea se combina con la suposición de separación en baja densidad: además de clasificar bien los ejemplos etiquetados, se prefiere que la frontera atraviese regiones del espacio de entrada donde haya pocos datos \cite{van2020survey,pmlr-v5-goldberg09a}.
+
+El representante más conocido es la \textit{Semi-Supervised Support Vector Machine} (S3VM), también denominada históricamente \textit{Transductive SVM} (TSVM) \cite{10.7551/mitpress/9780262033589.001.0001}. Para introducirla, repasamos primero la formulación básica de las SVM.
+
+\subsubsection{SVM} 
+
+Consideramos un conjunto etiquetado $\{(x_i,y_i)\}_{i=1}^l$ con $x_i\in\mathbb{R}^d$ e $y_i\in\{-1,1\}$, y un clasificador lineal de la forma
+\begin{equation}
+f(x)=w^{\top}x+b,
+\end{equation}
+donde $w\in\mathbb{R}^d$ y $b\in\mathbb{R}$ \cite{zhu2009introduction}. Por lo que la frontera de decisión es el siguiente hiperplano:
+\begin{equation}
+\left\{x\in\mathbb{R}^d: w^{\top}x+b=0\right\},
+\end{equation}
+mientras que la predicción se obtiene con $\mathrm{sign}(f(x))$.
+
+La distancia (no firmada) de un punto $x$ a dicho hiperplano es $\frac{|f(x)|}{\|w\|}$, y para los ejemplos etiquetados se toma la distancia con signo que es $\frac{y_i f(x_i)}{\|w\|}$. Con todo esto, el margen geométrico del clasificador se define como
+\begin{equation}
+\gamma = \min_{i=1,\dots,l} \frac{y_i\bigl(w^{\top}x_i+b\bigr)}{\|w\|}.
+\end{equation}
+Primero, vamos a asumir que los datos son \textit{linealmente separables}, es decir, que existe un hiperplano tal que $y_i\bigl(w^{\top}x_i+b\bigr)>0$ para todo $i=1,\dots,l$. Bajo esta suposición, el \textit{hard-margin SVM} busca el hiperplano separador que maximiza $\gamma$, lo que puede escribirse como
+\begin{equation}
+\max_{w,b} \quad \min_{i=1,\dots,l} \frac{y_i\bigl(w^{\top}x_i+b\bigr)}{\|w\|}.
+\end{equation}
+
+Este problema es invariante frente a escalado: si multiplicamos $(w,b)$ por una constante $c>0$, la frontera de decisión $\{x: w^{\top}x+b=0\}$ no cambia. Por ello, podemos fijar una escala imponiendo $\min_i y_i\bigl(w^{\top}x_i+b\bigr)=1$, equivalente a exigir $y_i\bigl(w^{\top}x_i+b\bigr)\ge 1$ para todo $i$. En consecuencia, maximizar el margen es equivalente a maximizar $\frac{1}{\|w\|}$, o de forma equivalente minimizar la norma de $w$:
+\begin{equation}
+\begin{aligned}
+\min_{w,b} \quad & \frac{1}{2}\|w\|^2 \\
+\text{s.a.} \quad & y_i\bigl(w^{\top}x_i+b\bigr) \geq 1, \quad i=1,\dots,l.
+\end{aligned}
+\end{equation}
+
+Cuando los datos no son separables (esto es, no existe un hiperplano que separe perfectamente las clases), se introduce el \textit{soft margin} mediante variables de holgura $\xi_i\ge 0$ y un parámetro $C>0$ que controla el compromiso entre maximizar el margen y minimizar errores. Intuitivamente, $\xi_i$ mide cuánto viola el ejemplo $i$ la restricción de margen: $\xi_i=0$ significa que se cumple el margen, $0<\xi_i<1$ indica que el punto queda dentro del margen pero sigue estando bien clasificado, y $\xi_i>1$ corresponde a una clasificación errónea.
+\begin{equation}
+\begin{aligned}
+\min_{w,b} \quad & \frac{1}{2}\|w\|^2 + C \sum_{i=1}^l \xi_i \\
+\text{s.a.} \quad & y_i\bigl(w^{\top}x_i+b\bigr) \geq 1 - \xi_i, \quad i=1,\dots,l, \\
+                  & \xi_i \geq 0.
+\end{aligned}
+\end{equation}
+
+Finalmente, puede expresarse en el marco de la minimización de riesgo regularizado (Sección \ref{sec:perdida_regularizacion}). Despejando $\xi_i$ de $y_i f(x_i) \ge 1-\xi_i$ obtenemos $\xi_i\ge 1-y_if(x_i)$, y junto con $\xi_i\ge 0$ se tiene $\xi_i=\max\bigl(0,1-y_if(x_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
+\begin{equation}
+\min_{w,b} \quad \frac{1}{2}\|w\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(x_i)\bigr).
+\end{equation}
+En este caso la función de pérdida es $c(x,y,f(x)) = \max\bigl(0, 1 - y f(x)\bigr)$ (pérdida \textit{hinge}) y el regularizador es $\frac{1}{2}\|w\|^2$.
+
+\subsubsection{S3VM}
+
+La idea central de las S3VM es incorporar un conjunto no etiquetado $\{x_j\}_{j=l+1}^{l+u}$ penalizando que dichos puntos queden cerca de la frontera: se prefiere que $|f(x_j)|$ sea grande, de modo que la frontera se sitúe en regiones de baja densidad \cite{van2020survey,10.7551/mitpress/9780262033589.001.0001}. Una forma estándar de derivar esta penalización es introducir etiquetas latentes $\hat{y}_j\in\{-1,1\}$ para los ejemplos no etiquetados y añadir un término de pérdida \textit{hinge} $\max\bigl(0,1-\hat{y}_j f(x_j)\bigr)$, que al minimizar respecto a $\hat{y}_j$ se convierte en $\max\bigl(0,1-|f(x_j)|\bigr)$, conocida como \textit{hat loss} \cite{10.7551/mitpress/9780262033589.001.0001}.
+
+Con ello, una formulación típica de S3VM es
+\begin{equation}
+\min_{w,b} \quad \frac{1}{2}\|w\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(x_i)\bigr) + C^* \sum_{j=l+1}^{l+u} \max\bigl(0, 1 - |f(x_j)|\bigr).
+\end{equation}
+
+En términos del marco de la Sección \ref{sec:perdida_regularizacion}, el sumatorio sobre los datos no etiquetados puede interpretarse como un término adicional dependiente de $\{x_j\}$, que incorpora explícitamente la suposición de separación en baja densidad.
+
+En la práctica suele ser necesario imponer alguna restricción adicional (por ejemplo, sobre el balance de etiquetas asignadas a los datos no etiquetados) para evitar soluciones degeneradas \cite{van2020survey}. El problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados; además, si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
+
+\subsection{Basados en perturbaciones}
+
+a
+
+\section{Basados en variedades}
+
