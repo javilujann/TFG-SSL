@@ -74,8 +74,7 @@ La mezcla de modelos es un enfoque que puede ser muy eficaz cuando el modelo gen
 
 \section{Discriminativos}
 
-Esta familia de métodos se distingue de la anterior, porque no trata de modelar el proceso generativo y la densidad conjunta $p(\mathbf{x},y)$, sino que se centra directamente en aprender un modelo discriminativo $p(y\mid\mathbf{x})$ o una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ \cite{ng2001discriminative}. En este caso, la información de los datos no etiquetados se incorporan con el objetivo de mejorar la generalización, normalmente a través de suposiciones adicionales sobre la estructura de los datos (por ejemplo, separación en baja densidad o la suavidad) \cite{van2020survey}.
-
+Esta familia de métodos se distingue de la anterior en que no trata de modelar el proceso generativo ni la densidad conjunta $p(\mathbf{x},y)$, sino que se centra directamente en aprender un modelo discriminativo $p(y\mid\mathbf{x})$ o una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ \cite{ng2001discriminative}. En este caso, la información de los datos no etiquetados se incorpora con el objetivo de mejorar la generalización del modelo, normalmente a través de suposiciones adicionales sobre la distribución subyacente de los datos (por ejemplo, la separación en baja densidad o la suposición de suavidad) \cite{van2020survey}.
 \subsection{Máximo margen}
 \label{subsec:maximo_margen}
 
@@ -141,8 +140,42 @@ En términos del marco de la Sección \ref{sec:perdida_regularizacion}, el sumat
 En la práctica suele ser necesario imponer alguna restricción adicional (por ejemplo, sobre el balance de etiquetas asignadas a los datos no etiquetados) para evitar soluciones degeneradas \cite{van2020survey}. El problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados; además, si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
 
 \subsection{Basados en perturbaciones}
+Por otra parte, los métodos basados en perturbaciones se fundamentan en la suposición de suavidad: puntos cercanos en el espacio de entrada deberían tener etiquetas similares \cite{10.7551/mitpress/9780262033589.001.0001}. Para aprovechar esta suposición, se introducen perturbaciones o ruido estocástico en los datos de entrenamiento y se añade un término de regularización por consistencia a la función de pérdida. Este término penaliza que el modelo produzca predicciones diferentes para las versiones original y perturbada de un mismo ejemplo \cite{van2020survey}.
 
-a
+Este enfoque se ha popularizado especialmente en el contexto de las redes neuronales profundas, debido a su capacidad para aprender representaciones ricas y a la facilidad algorítmica de incorporar perturbaciones en el proceso de entrenamiento \cite{van2020survey}. Un ejemplo pionero es el método \textit{ladder network} \cite{rasmus2015semi}, que combina una arquitectura de red neuronal con un término de pérdida que evalúa la discrepancia entre las activaciones de la red para ejemplos limpios y perturbados.
 
+\subsubsection{Redes neuronales}
+
+Antes de proceder a exponer el método de las \textit{ladder networks}, repasamos brevemente el marco general de las redes neuronales, más concretamente el marco de las redes neuronales feedforward. 
+
+Una red neuronal es un sistema que transforma un vector de entrada $x\in\mathbb{R}^d$ en un vector de salida $f(x)\in\mathbb{R}^k$ mediante la propagación de la entrada por una serie de capas conectadas secuencialmente \cite{van2020survey}.
+
+Cada capa de la red se compone de un conjunto de perceptrones, un modelo matemático de neurona. Cada uno de estos perceptrones recibe como entrada un vector $z\in\mathbb{R}^m$, o bien el de entrada o bien las salidas de la capa anterior, y produce una salida escalar $a\in\mathbb{R}$ mediante la aplicación de una función de activación $\sigma:\mathbb{R}\to\mathbb{R}$ a una combinación lineal de las entradas, es decir, $a=\sigma(w^{\top}z+b)$, donde $w\in\mathbb{R}^m$ y $b\in\mathbb{R}$ son los parámetros del perceptrón \cite{bishop2006pattern}.
+
+En el contexto de aprendizaje supervisado, el entrenamiento de la red neuronal consiste en ajustar los parámetros de los perceptrones, representados por una matriz $W$ que contiene tanto los pesos $w$ como los sesgos $b$, para minimizar una función de pérdida \cite{van2020survey}.
+
+\begin{equation}
+    \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(x_i,y_i,f(x_i;W))
+\end{equation}
+
+Los parámetros se optimizan iterativamente mediante la retropropagación del error, normalmente con un método de descenso de gradiente estocástico o alguna de sus variantes \cite{NIPS2014_f033ed80}.
+
+\subsubsection{Ladder networks}
+
+Una vez introducidos los conceptos básicos de las redes neuronales, es posible presentar el método de las \textit{ladder networks} \cite{rasmus2015semi}. Este enfoque extiende la arquitectura de una red neuronal feedforward estándar incorporando un término de pérdida no supervisado, basado en el principio de los autoencoders eliminadores de ruido.
+
+En concreto, el modelo se estructura en un codificador y un decodificador. Durante el entrenamiento, cada dato de entrada realiza dos pasadas por el codificador: una pasada limpia y una pasada a la que se le inyecta ruido en todas las capas ocultas. Posteriormente, el decodificador intenta ir limpiando este ruido hacia atrás, reconstruyendo las activaciones limpias originales capa por capa a partir de las representaciones perturbadas. De este modo, el término de pérdida global se define como la suma del coste de clasificación supervisado y un coste de consistencia o reconstrucción calculado a lo largo de todas las capas de la red \cite{rasmus2015semi}.
+
+La función de pérdida total a optimizar se puede formular de la siguiente manera:
+\begin{equation}
+    \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(x_i,y_i,f(x_i;W)) + \sum_{i=1}^{l+u} \sum_{k=1}^K ReconstructionLoss\bigl(\hat{z}_i^k, z_i^k\bigr)
+\end{equation}
+
+Donde $z_i^k$ es la activación oculta de la capa $k$ en el codificador para el ejemplo limpio $x_i$, mientras que $\hat{z}_i^k$ es la activación reconstruida por el decodificador a partir de la versión perturbada. Finalmente, $\text{ReconstructionLoss}$ es una función que penaliza la discrepancia entre ambas (como, por ejemplo, la norma $L_2$ al cuadrado) \cite{rasmus2015semi}.
+
+A través de esta arquitectura, las \textit{ladder networks} consiguen aprovechar simultáneamente tanto la señal de los datos etiquetados como la regularización proporcionada por los datos no etiquetados\footnote{Esta simultaneidad es, de hecho, lo que hace a las \textit{ladder networks} modelos intrínsecos, a diferencia del preentrenamiento por capas visto en la Sección \ref{sec:pre-training}, donde se usaba un \textit{encoder-decoder} como fase inicial independiente seguida de la fase supervisada.}, forzando a la red a extraer características latentes útiles y robustas al ruido que, en última instancia, mejoran la generalización del modelo predictivo \cite{rasmus2015semi}.
 \section{Basados en variedades}
 
+Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque al igual que los métodos discriminativos se centran en aprender una función de decisión, su enfoque subyacente es fundamentalmente distinto al de las técnicas de máximo margen o de perturbaciones.
+
+Estos métodos se basan en la hipótesis de la variedad, asumiendo que los datos observados residen en realidad sobre una variedad topológica de baja dimensión inmersa dentro del espacio de entrada original \cite{10.7551/mitpress/9780262033589.001.0001}. En consecuencia, el papel de los datos no etiquetados no es simplemente ajustar una frontera global, sino caracterizar la estructura geométrica de dicha variedad. Descubrir esta topología subyacente restringe el espacio de funciones posibles, facilitando el aprendizaje de un modelo más robusto que respete las distancias intrínsecas de los datos \cite{van2020survey}.
