@@ -4,11 +4,77 @@ Pasamos ahora en este capítulo a describir los métodos intrínsecamente semi-s
 
 \section{Generativos}
 
-Métodos generativos
+Los métodos generativos constituyen uno de los enfoques clásicos del aprendizaje semi-supervisado \cite{zhu2005semi}. Su idea central es modelar explícitamente el proceso que genera los datos, esto es, la distribución conjunta $p(\mathbf{x},y)$, y, una vez estimada, usarla de diferentes formas para clasificar \cite{van2020survey}. Este enfoque conecta directamente con la discusión del Capítulo 2 sobre cómo la información de $p(\mathbf{x})$ puede ayudar a inferir $p(y\mid\mathbf{x})$ (Sección \ref{sec:suposiciones}).
+
+Dentro de esta familia, el referente clásico son los modelos de mezcla optimizados mediante máxima verosimilitud, normalmente con el algoritmo EM cuando hay variables latentes \cite{zhu2009introduction,dempster1977maximum}.
+
+\subsection{Mezcla de modelos}
+
+Los modelos de mezcla asumen que los datos se generan a partir de una combinación de componentes probabilísticas, típicamente una por clase, con parámetros desconocidos \cite{van2020survey}. Bajo este supuesto, los datos etiquetados y no etiquetados pueden contribuir conjuntamente a estimar el modelo.
+
+La intuición en semi-supervisado es que los datos no etiquetados ayudan a identificar la estructura de la mezcla (componentes, pesos y forma), mientras que los pocos datos etiquetados permiten asociar componentes a clases \cite{zhu2005semi,zhu2009introduction}.
+
+\subsubsection{Mezcla de modelos supervisada}
+
+Dada una instancia $\mathbf{x}$, la predicción se obtiene tomando la clase más probable a posteriori:
+
+\begin{equation}
+    \hat{y} = \operatorname*{arg\,max}_{y} p(y|\mathbf{x})
+\end{equation}
+
+Para realizar dicho cálculo, se emplea la regla de Bayes:
+
+\begin{equation}
+    p(y|\mathbf{x}) = \frac{p(\mathbf{x}|y)p(y)}{\sum_{y'}p(\mathbf{x}|y')p(y')}
+\end{equation}
+
+por lo que el problema se reduce a estimar $p(\mathbf{x}|y)$ y $p(y)$. En el contexto de una mezcla de componentes probabilísticos, esto equivale a estimar los parámetros que definen dichas componentes.  
+
+Si denotamos por $\theta$ al vector con los parámetros que definen los modelos y por $D_L=\{(\mathbf{x}_i,y_i)\}_{i=1}^{l}$ al conjunto etiquetado. Entonces el estimador de máxima verosimilitud de los parámetros es
+
+\begin{equation}
+    \hat{\theta} = \operatorname*{arg\,max}_{\theta} p(D_L|\theta) = \operatorname*{arg\,max}_{\theta} \log p(D_L|\theta).
+\end{equation}
+
+Es decir, buscamos los parámetros $\theta$ que maximizan la verosimilitud de los datos de entrenamiento. Además, como estamos tratando con datos independientes e idénticamente distribuidos, la verosimilitud se factoriza como el producto de las probabilidades individuales, lo que nos lleva a la siguiente expresión para la log-verosimilitud:
+
+\begin{equation}
+     \log p(D_L|\theta) = \log \prod_{i=1}^{l} p(\mathbf{x}_i, y_i|\theta)
+     = \sum_{i=1}^{l} \log \bigl(p(y_i|\theta)p(\mathbf{x}_i|y_i,\theta)\bigr).
+\end{equation}
+
+Para familias concretas (por ejemplo, mezclas gaussianas con etiquetas observadas), este problema suele admitir estimadores cerrados o de optimización relativamente directa \cite{zhu2009introduction}.
+
+\subsubsection{Mezcla de modelos semi-supervisada}
+
+En el caso semi-supervisado se dispone, además de $D_L$, de un conjunto no etiquetado $D_U=\{\mathbf{x}_j\}_{j=l+1}^{l+u}$. El conjunto completo es $D=D_L\cup D_U$, y la log-verosimilitud pasa a ser:
+
+\begin{equation}
+    \log p(D|\theta) = \sum_{i=1}^{l} \log p(\mathbf{x}_i,y_i|\theta) + \sum_{j=l+1}^{l+u} \log p(\mathbf{x}_j|\theta).
+\end{equation}
+
+Donde en el término de los datos no etiquetados se incorpora la distribución marginal
+\begin{equation}
+    p(\mathbf{x}_j|\theta)=\sum_{y\in\mathcal{Y}} p(\mathbf{x}_j,y|\theta)=\sum_{y\in\mathcal{Y}} p(y|\theta)p(\mathbf{x}_j|y,\theta),
+\end{equation}
+que refleja que la etiqueta de $\mathbf{x}_j$ es desconocida \cite{zhu2009introduction}.
+
+En general, esta optimización deja de ser cóncava y no suele resolverse de forma analítica. Por ello, el método estándar es EM, un procedimiento iterativo de máxima verosimilitud con variables latentes \cite{dempster1977maximum}. De forma intuitiva, EM repite el siguiente ciclo:
+\begin{itemize}
+    \item \textbf{Inicialización}: partir de unos parámetros iniciales $\theta^{(0)}$ (por ejemplo, obtenidos con los datos etiquetados).
+    \item \textbf{E-step}: con los parámetros actuales, estimar para cada dato no etiquetado la probabilidad de pertenecer a cada clase, es decir, una etiqueta \textit{blanda}.
+    \item \textbf{M-step}: de manera análoga al caso supervisado, reestimar los parámetros del modelo, pero usando ahora las etiquetas probabilísticas obtenidas en la E-step como pesos en la máxima verosimilitud.
+    \item \textbf{Iteración}: repetir E-step y M-step hasta convergencia.
+\end{itemize}
+
+Esta dinámica es conceptualmente parecida al pseudoetiquetado de los métodos envolventes (Capítulo \ref{cap:envolventes}) \cite{zhu2009introduction,zhou2010semi}, pero aquí las asignaciones para $D_U$ son probabilísticas, mientras que en los métodos envolventes se termina obteniendo una etiqueta final para cada ejemplo.
+
+La mezcla de modelos es un enfoque que puede ser muy eficaz cuando el modelo generativo está bien especificado. Sin embargo, su rendimiento depende críticamente de hipótesis como la identificabilidad de la mezcla y la corrección del modelo; si estas fallan, los datos no etiquetados pueden degradar el rendimiento \cite{zhu2005semi,van2020survey}.
+
 
 \section{Discriminativos}
 
-a
+Esta familia de métodos se distingue de la anterior, porque no trata de modelar el proceso generativo y la densidad conjunta $p(\mathbf{x},y)$, sino que se centra directamente en aprender un modelo discriminativo $p(y\mid\mathbf{x})$ o una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ \cite{ng2001discriminative}. En este caso, la información de los datos no etiquetados se incorporan con el objetivo de mejorar la generalización, normalmente a través de suposiciones adicionales sobre la estructura de los datos (por ejemplo, separación en baja densidad o la suavidad) \cite{van2020survey}.
 
 \subsection{Máximo margen}
 \label{subsec:maximo_margen}

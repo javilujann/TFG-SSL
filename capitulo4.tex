@@ -1,4 +1,6 @@
 \chapter{Métodos envolventes}
+\label{cap:envolventes}
+
 La familia de métodos envolventes es de las más viejas y ampliamente conocidas dentro del aprendizaje semi-supervisado \cite{zhou2010semi}. Como se ha explicado a la hora de presentar esta categoría en la taxonomía (Sección \ref{sec:div-uso-etiquetas}), estos métodos se basan en la idea del \textit{pseudoetiquetado}, un procedimiento iterativo donde cada iteración consiste en dos pasos: primero se entrena a uno o varios clasificadores supervisados con los datos etiquetados originales y posiblemente con datos etiquetados de iteraciones anteriores, y luego se utilizan estos clasificadores para predecir etiquetas para los datos no etiquetados, las predicciones de mayor confianza son entonces añadidas al conjunto de datos etiquetados, convirtiéndose en datos pseudoetiquetados. Este proceso se repite hasta que se cumpla un criterio de parada, como por ejemplo un número máximo de iteraciones o una mejora mínima en el rendimiento del modelo.
 
 Esta familia de métodos tiene varias peculiaridades que vamos a exponer a continuación:
