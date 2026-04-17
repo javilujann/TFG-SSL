@@ -176,6 +176,37 @@ Donde $z_i^k$ es la activación oculta de la capa $k$ en el codificador para el 
 A través de esta arquitectura, las \textit{ladder networks} consiguen aprovechar simultáneamente tanto la señal de los datos etiquetados como la regularización proporcionada por los datos no etiquetados\footnote{Esta simultaneidad es, de hecho, lo que hace a las \textit{ladder networks} modelos intrínsecos, a diferencia del preentrenamiento por capas visto en la Sección \ref{sec:pre-training}, donde se usaba un \textit{encoder-decoder} como fase inicial independiente seguida de la fase supervisada.}, forzando a la red a extraer características latentes útiles y robustas al ruido que, en última instancia, mejoran la generalización del modelo predictivo \cite{rasmus2015semi}.
 \section{Basados en variedades}
 
-Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque al igual que los métodos discriminativos se centran en aprender una función de decisión, su enfoque subyacente es fundamentalmente distinto al de las técnicas de máximo margen o de perturbaciones.
+Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque (al igual que los métodos discriminativos) se centran en aprender una función de decisión, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
 
-Estos métodos se basan en la hipótesis de la variedad, asumiendo que los datos observados residen en realidad sobre una variedad topológica de baja dimensión inmersa dentro del espacio de entrada original \cite{10.7551/mitpress/9780262033589.001.0001}. En consecuencia, el papel de los datos no etiquetados no es simplemente ajustar una frontera global, sino caracterizar la estructura geométrica de dicha variedad. Descubrir esta topología subyacente restringe el espacio de funciones posibles, facilitando el aprendizaje de un modelo más robusto que respete las distancias intrínsecas de los datos \cite{van2020survey}.
+Estos métodos se apoyan en la hipótesis de la variedad: se asume que los datos observados se concentran cerca de una variedad de baja dimensión inmersa en el espacio de entrada original \cite{10.7551/mitpress/9780262033589.001.0001}. En consecuencia, el papel de los datos no etiquetados no es solo ajustar una frontera global, sino capturar la geometría de dicha variedad y orientar la búsqueda hacia funciones que respeten su estructura intrínseca \cite{van2020survey}.
+
+\subsection{Técnicas de regularización de la variedad}
+
+Una forma habitual de aproximar la variedad subyacente es construir un grafo de similitud entre instancias \cite{van2020survey}. Dado un conjunto de entrenamiento formado por $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$ instancias etiquetadas y $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ instancias sin etiquetar, se construye un grafo no dirigido $G=(V,E)$ donde cada nodo corresponde a una instancia (etiquetada o no)\footnote{Como consecuencia, los grafos resultantes suelen tener gran tamaño cuando se dispone de una gran cantidad de instancias no etiquetadas \cite{zhu2009introduction}.}, y a cada arista $(i,j)\in E$ se le asigna un peso $w_{ij}$ que refleja la similitud entre $\mathbf{x}_i$ y $\mathbf{x}_j$. Denotamos por $W=(w_{ij})$ la matriz de pesos. La intuición es que, si $w_{ij}$ es alto, entonces es más probable que ambas instancias compartan etiqueta \cite{zhu2009introduction}.
+
+Hay varias formas de definir la vecindad y/o la similitud. Por ejemplo, puede construirse un grafo de $k$ vecinos más cercanos (k-NN) y asignar pesos gaussianos $w_{ij} = \exp\bigl(-\frac{\|\mathbf{x}_i - \mathbf{x}_j\|^2}{2\sigma^2}\bigr)$ a las aristas \cite{zhu2009introduction}.
+
+Una vez construido el grafo, se busca una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ que no solo clasifique correctamente los ejemplos etiquetados, sino que también sea suave respecto a la estructura del grafo; es decir, que produzca salidas similares en nodos conectados por aristas con pesos altos \cite{zhu2009introduction}.
+
+Para ello, un enfoque representativo es el presentado en \textit{On Manifold Regularization, Belkin et al., 2005} \cite{belkin2005manifold}. Partiendo de un marco de aprendizaje supervisado, se considera un kernel $K$\footnote{Un kernel es una función $K:\mathcal{X}\times\mathcal{X}\to\mathbb{R}$ que puede interpretarse como un producto escalar en un espacio de características (posiblemente de mayor dimensión) \cite{bishop2006pattern}.}, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
+\begin{equation}
+    \mathcal{L}(f) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i)) + \lambda \|f\|_K^2,
+\end{equation}
+
+donde el primer término es la pérdida de clasificación sobre los datos etiquetados y el segundo término es un regularizador que penaliza la complejidad de la función $f$ \cite{belkin2005manifold}.
+
+Además, se añade un término de regularización adicional, utilizando la matriz de pesos $W$ del grafo, que penaliza la falta de suavidad de $f$ respecto a la estructura del grafo:
+\begin{equation}
+    \|f\|_I^2 = \frac{1}{2} \sum_{i,j} w_{ij} \bigl(f(\mathbf{x}_i) - f(\mathbf{x}_j)\bigr)^2,
+\end{equation}
+
+este se puede interpretar como una medida de la variación de $f$ a lo largo de las aristas del grafo, ponderada por los pesos de similitud. De este modo, la función de pérdida total a minimizar es
+\begin{equation}
+    \mathcal{L}(f) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i)) + \lambda_A \|f\|_K^2 + \lambda_I \|f\|_I^2,
+\end{equation}
+
+donde $\lambda_A$ y $\lambda_I$ son hiperparámetros que controlan el peso relativo de cada término de regularización \cite{belkin2005manifold}.
+
+Dependiendo de la elección del kernel $K$ y de la función de pérdida $c$, esta formulación puede dar lugar a diferentes algoritmos concretos. Un ejemplo clásico son las \textit{Laplacian SVM}, que combinan una pérdida \textit{hinge} con el término de regularización basado en el grafo. De este modo, a diferencia de las S3VM vistas en la sección anterior, la información no etiquetada se incorpora a través de la geometría del grafo y no mediante la penalización directa de puntos cercanos a la frontera de decisión \cite{van2020survey}.
+
+En la práctica, estos métodos pueden ser costosos computacionalmente, ya que suelen requerir operar con matrices de tamaño $n\times n$ (donde $n=l+u$). En particular, en algunos casos el coste puede alcanzar $O(n^3)$, o bien $O(c\,n^2)$ para un $c \ll n$ \cite{van2020survey}. Además, el rendimiento es muy sensible a cómo se construye el grafo y a la elección y escala de los pesos $w_{ij}$; si el grafo no refleja bien la geometría de los datos, la información no etiquetada puede propagarse de forma perjudicial \cite{zhu2009introduction}.
