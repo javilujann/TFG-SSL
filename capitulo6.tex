@@ -1,12 +1,14 @@
 \chapter{Métodos intrínsecamente semi-supervisados}
 
-Pasamos ahora en este capítulo a describir los métodos intrínsecamente semi-supervisados, es decir, aquellos que desde su concepción están diseñados para tratar tanto con datos etiquetados como con datos no etiquetados.
+En este capítulo se describen los métodos intrínsecamente semi-supervisados, es decir, aquellos que desde su concepción están diseñados para entrenar de manera conjunta con datos etiquetados y no etiquetados. Su rasgo distintivo es que los ejemplos no etiquetados no aparecen como una etapa auxiliar o previa, sino que se incorporan de forma explícita en la formulación del método: bien a través de un modelo probabilístico (por ejemplo, en la verosimilitud de $p(\mathbf{x},y)$), o bien como términos adicionales en la función objetivo (por ejemplo, regularización, consistencia o suavidad).
+
+Siguiendo la última división de los métodos inductivos presentada en la taxonomía del Capítulo 3, organizamos los métodos intrínsecos en tres grandes grupos: métodos generativos, métodos discriminativos y métodos basados en variedades. En cada caso se introduce la intuición del enfoque y se presentan formulaciones representativas: mezclas de modelos optimizadas con EM, clasificadores de máximo margen como las S3VM y métodos basados en perturbaciones como las \textit{ladder networks}, y, finalmente, técnicas de regularización de la variedad mediante grafos.
 
 \section{Generativos}
 
 Los métodos generativos constituyen uno de los enfoques clásicos del aprendizaje semi-supervisado \cite{zhu2005semi}. Su idea central es modelar explícitamente el proceso que genera los datos, esto es, la distribución conjunta $p(\mathbf{x},y)$, y, una vez estimada, usarla de diferentes formas para clasificar \cite{van2020survey}. Este enfoque conecta directamente con la discusión del Capítulo 2 sobre cómo la información de $p(\mathbf{x})$ puede ayudar a inferir $p(y\mid\mathbf{x})$ (Sección \ref{sec:suposiciones}).
 
-Dentro de esta familia, el referente clásico son los modelos de mezcla optimizados mediante máxima verosimilitud, normalmente con el algoritmo EM cuando hay variables latentes \cite{zhu2009introduction,dempster1977maximum}.
+Dentro de esta familia, el referente clásico son los modelos de mezcla optimizados mediante máxima verosimilitud, normalmente con el algoritmo EM cuando hay variables latentes \cite{dempster1977maximum}.
 
 \subsection{Mezcla de modelos}
 
@@ -30,16 +32,16 @@ Para realizar dicho cálculo, se emplea la regla de Bayes:
 
 por lo que el problema se reduce a estimar $p(\mathbf{x}|y)$ y $p(y)$. En el contexto de una mezcla de componentes probabilísticos, esto equivale a estimar los parámetros que definen dichas componentes.  
 
-Si denotamos por $\theta$ al vector con los parámetros que definen los modelos y por $D_L=\{(\mathbf{x}_i,y_i)\}_{i=1}^{l}$ al conjunto etiquetado. Entonces el estimador de máxima verosimilitud de los parámetros es
+Si denotamos por $\theta$ al vector con los parámetros que definen los modelos y por $D_l=\{(\mathbf{x}_i,y_i)\}_{i=1}^{l}$ al conjunto etiquetado. Entonces el estimador de máxima verosimilitud de los parámetros es
 
 \begin{equation}
-    \hat{\theta} = \operatorname*{arg\,max}_{\theta} p(D_L|\theta) = \operatorname*{arg\,max}_{\theta} \log p(D_L|\theta).
+    \hat{\theta} = \operatorname*{arg\,max}_{\theta} p(D_l|\theta) = \operatorname*{arg\,max}_{\theta} \log p(D_l|\theta).
 \end{equation}
 
 Es decir, buscamos los parámetros $\theta$ que maximizan la verosimilitud de los datos de entrenamiento. Además, como estamos tratando con datos independientes e idénticamente distribuidos, la verosimilitud se factoriza como el producto de las probabilidades individuales, lo que nos lleva a la siguiente expresión para la log-verosimilitud:
 
 \begin{equation}
-     \log p(D_L|\theta) = \log \prod_{i=1}^{l} p(\mathbf{x}_i, y_i|\theta)
+    \log p(D_l|\theta) = \log \prod_{i=1}^{l} p(\mathbf{x}_i, y_i|\theta)
      = \sum_{i=1}^{l} \log \bigl(p(y_i|\theta)p(\mathbf{x}_i|y_i,\theta)\bigr).
 \end{equation}
 
@@ -47,7 +49,7 @@ Para familias concretas (por ejemplo, mezclas gaussianas con etiquetas observada
 
 \subsubsection{Mezcla de modelos semi-supervisada}
 
-En el caso semi-supervisado se dispone, además de $D_L$, de un conjunto no etiquetado $D_U=\{\mathbf{x}_j\}_{j=l+1}^{l+u}$. El conjunto completo es $D=D_L\cup D_U$, y la log-verosimilitud pasa a ser:
+En el caso semi-supervisado se dispone, además de $D_l$, de un conjunto no etiquetado $D_u=\{\mathbf{x}_j\}_{j=l+1}^{l+u}$. El conjunto completo es $D=D_l\cup D_u$, y la log-verosimilitud pasa a ser:
 
 \begin{equation}
     \log p(D|\theta) = \sum_{i=1}^{l} \log p(\mathbf{x}_i,y_i|\theta) + \sum_{j=l+1}^{l+u} \log p(\mathbf{x}_j|\theta).
@@ -67,7 +69,7 @@ En general, esta optimización deja de ser cóncava y no suele resolverse de for
     \item \textbf{Iteración}: repetir E-step y M-step hasta convergencia.
 \end{itemize}
 
-Esta dinámica es conceptualmente parecida al pseudoetiquetado de los métodos envolventes (Capítulo \ref{cap:envolventes}) \cite{zhu2009introduction,zhou2010semi}, pero aquí las asignaciones para $D_U$ son probabilísticas, mientras que en los métodos envolventes se termina obteniendo una etiqueta final para cada ejemplo.
+Esta dinámica es conceptualmente parecida al pseudoetiquetado de los métodos envolventes (Capítulo \ref{cap:envolventes}) \cite{zhu2009introduction,zhou2010semi}, pero aquí las asignaciones para $D_u$ son probabilísticas, mientras que en los métodos envolventes se termina obteniendo una etiqueta final para cada ejemplo.
 
 La mezcla de modelos es un enfoque que puede ser muy eficaz cuando el modelo generativo está bien especificado. Sin embargo, su rendimiento depende críticamente de hipótesis como la identificabilidad de la mezcla y la corrección del modelo; si estas fallan, los datos no etiquetados pueden degradar el rendimiento \cite{zhu2005semi,van2020survey}.
 
@@ -84,58 +86,58 @@ El representante más conocido es la \textit{Semi-Supervised Support Vector Mach
 
 \subsubsection{SVM} 
 
-Consideramos un conjunto etiquetado $\{(x_i,y_i)\}_{i=1}^l$ con $x_i\in\mathbb{R}^d$ e $y_i\in\{-1,1\}$, y un clasificador lineal de la forma
+Consideramos un conjunto etiquetado $\{(\mathbf{x}_i,y_i)\}_{i=1}^l$ con $\mathbf{x}_i\in\mathbb{R}^d$ e $y_i\in\{-1,1\}$, y un clasificador lineal de la forma
 \begin{equation}
-f(x)=w^{\top}x+b,
+f(\mathbf{x})=\mathbf{w}^{\top}\mathbf{x}+b,
 \end{equation}
-donde $w\in\mathbb{R}^d$ y $b\in\mathbb{R}$ \cite{zhu2009introduction}. Por lo que la frontera de decisión es el siguiente hiperplano:
+donde $\mathbf{w}\in\mathbb{R}^d$ y $b\in\mathbb{R}$ \cite{zhu2009introduction}. Por lo que la frontera de decisión es el siguiente hiperplano:
 \begin{equation}
-\left\{x\in\mathbb{R}^d: w^{\top}x+b=0\right\},
+\left\{\mathbf{x}\in\mathbb{R}^d: \mathbf{w}^{\top}\mathbf{x}+b=0\right\},
 \end{equation}
-mientras que la predicción se obtiene con $\mathrm{sign}(f(x))$.
+mientras que la predicción se obtiene con $\mathrm{sign}(f(\mathbf{x}))$.
 
-La distancia (no firmada) de un punto $x$ a dicho hiperplano es $\frac{|f(x)|}{\|w\|}$, y para los ejemplos etiquetados se toma la distancia con signo que es $\frac{y_i f(x_i)}{\|w\|}$. Con todo esto, el margen geométrico del clasificador se define como
+La distancia (no firmada) de un punto $\mathbf{x}$ a dicho hiperplano es $\frac{|f(\mathbf{x})|}{\|\mathbf{w}\|}$, y para los ejemplos etiquetados se toma la distancia con signo que es $\frac{y_i f(\mathbf{x}_i)}{\|\mathbf{w}\|}$. Con todo esto, el margen geométrico del clasificador se define como
 \begin{equation}
-\gamma = \min_{i=1,\dots,l} \frac{y_i\bigl(w^{\top}x_i+b\bigr)}{\|w\|}.
+\gamma = \min_{i=1,\dots,l} \frac{y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)}{\|\mathbf{w}\|}.
 \end{equation}
-Primero, vamos a asumir que los datos son \textit{linealmente separables}, es decir, que existe un hiperplano tal que $y_i\bigl(w^{\top}x_i+b\bigr)>0$ para todo $i=1,\dots,l$. Bajo esta suposición, el \textit{hard-margin SVM} busca el hiperplano separador que maximiza $\gamma$, lo que puede escribirse como
+Primero, vamos a asumir que los datos son \textit{linealmente separables}, es decir, que existe un hiperplano tal que $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)>0$ para todo $i=1,\dots,l$. Bajo esta suposición, el \textit{hard-margin SVM} busca el hiperplano separador que maximiza $\gamma$, lo que puede escribirse como
 \begin{equation}
-\max_{w,b} \quad \min_{i=1,\dots,l} \frac{y_i\bigl(w^{\top}x_i+b\bigr)}{\|w\|}.
+\max_{\mathbf{w},b} \quad \min_{i=1,\dots,l} \frac{y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)}{\|\mathbf{w}\|}.
 \end{equation}
 
-Este problema es invariante frente a escalado: si multiplicamos $(w,b)$ por una constante $c>0$, la frontera de decisión $\{x: w^{\top}x+b=0\}$ no cambia. Por ello, podemos fijar una escala imponiendo $\min_i y_i\bigl(w^{\top}x_i+b\bigr)=1$, equivalente a exigir $y_i\bigl(w^{\top}x_i+b\bigr)\ge 1$ para todo $i$. En consecuencia, maximizar el margen es equivalente a maximizar $\frac{1}{\|w\|}$, o de forma equivalente minimizar la norma de $w$:
+Este problema es invariante frente a escalado: si multiplicamos $(\mathbf{w},b)$ por una constante $c>0$, la frontera de decisión $\{\mathbf{x}: \mathbf{w}^{\top}\mathbf{x}+b=0\}$ no cambia. Por ello, podemos fijar una escala imponiendo $\min_i y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)=1$, equivalente a exigir $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)\ge 1$ para todo $i$. En consecuencia, maximizar el margen es equivalente a maximizar $\frac{1}{\|\mathbf{w}\|}$, o de forma equivalente minimizar la norma de $\mathbf{w}$:
 \begin{equation}
 \begin{aligned}
-\min_{w,b} \quad & \frac{1}{2}\|w\|^2 \\
-\text{s.a.} \quad & y_i\bigl(w^{\top}x_i+b\bigr) \geq 1, \quad i=1,\dots,l.
+\min_{\mathbf{w},b} \quad & \frac{1}{2}\|\mathbf{w}\|^2 \\
+\text{s.a.} \quad & y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr) \geq 1, \quad i=1,\dots,l.
 \end{aligned}
 \end{equation}
 
 Cuando los datos no son separables (esto es, no existe un hiperplano que separe perfectamente las clases), se introduce el \textit{soft margin} mediante variables de holgura $\xi_i\ge 0$ y un parámetro $C>0$ que controla el compromiso entre maximizar el margen y minimizar errores. Intuitivamente, $\xi_i$ mide cuánto viola el ejemplo $i$ la restricción de margen: $\xi_i=0$ significa que se cumple el margen, $0<\xi_i<1$ indica que el punto queda dentro del margen pero sigue estando bien clasificado, y $\xi_i>1$ corresponde a una clasificación errónea.
 \begin{equation}
 \begin{aligned}
-\min_{w,b} \quad & \frac{1}{2}\|w\|^2 + C \sum_{i=1}^l \xi_i \\
-\text{s.a.} \quad & y_i\bigl(w^{\top}x_i+b\bigr) \geq 1 - \xi_i, \quad i=1,\dots,l, \\
+\min_{\mathbf{w},b} \quad & \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \xi_i \\
+\text{s.a.} \quad & y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr) \geq 1 - \xi_i, \quad i=1,\dots,l, \\
                   & \xi_i \geq 0.
 \end{aligned}
 \end{equation}
 
-Finalmente, puede expresarse en el marco de la minimización de riesgo regularizado (Sección \ref{sec:perdida_regularizacion}). Despejando $\xi_i$ de $y_i f(x_i) \ge 1-\xi_i$ obtenemos $\xi_i\ge 1-y_if(x_i)$, y junto con $\xi_i\ge 0$ se tiene $\xi_i=\max\bigl(0,1-y_if(x_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
+Finalmente, puede expresarse en el marco de la minimización de riesgo regularizado (Sección \ref{sec:perdida_regularizacion}). Despejando $\xi_i$ de $y_i f(\mathbf{x}_i) \ge 1-\xi_i$ obtenemos $\xi_i\ge 1-y_if(\mathbf{x}_i)$, y junto con $\xi_i\ge 0$ se tiene $\xi_i=\max\bigl(0,1-y_if(\mathbf{x}_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
 \begin{equation}
-\min_{w,b} \quad \frac{1}{2}\|w\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(x_i)\bigr).
+\min_{\mathbf{w},b} \quad \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(\mathbf{x}_i)\bigr).
 \end{equation}
-En este caso la función de pérdida es $c(x,y,f(x)) = \max\bigl(0, 1 - y f(x)\bigr)$ (pérdida \textit{hinge}) y el regularizador es $\frac{1}{2}\|w\|^2$.
+En este caso la función de pérdida es $c(\mathbf{x},y,f(\mathbf{x})) = \max\bigl(0, 1 - y f(\mathbf{x})\bigr)$ (pérdida \textit{hinge}) y el regularizador es $\frac{1}{2}\|\mathbf{w}\|^2$.
 
 \subsubsection{S3VM}
 
-La idea central de las S3VM es incorporar un conjunto no etiquetado $\{x_j\}_{j=l+1}^{l+u}$ penalizando que dichos puntos queden cerca de la frontera: se prefiere que $|f(x_j)|$ sea grande, de modo que la frontera se sitúe en regiones de baja densidad \cite{van2020survey,10.7551/mitpress/9780262033589.001.0001}. Una forma estándar de derivar esta penalización es introducir etiquetas latentes $\hat{y}_j\in\{-1,1\}$ para los ejemplos no etiquetados y añadir un término de pérdida \textit{hinge} $\max\bigl(0,1-\hat{y}_j f(x_j)\bigr)$, que al minimizar respecto a $\hat{y}_j$ se convierte en $\max\bigl(0,1-|f(x_j)|\bigr)$, conocida como \textit{hat loss} \cite{10.7551/mitpress/9780262033589.001.0001}.
+La idea central de las S3VM es incorporar un conjunto no etiquetado $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ penalizando que dichos puntos queden cerca de la frontera: se prefiere que $|f(\mathbf{x}_j)|$ sea grande, de modo que la frontera se sitúe en regiones de baja densidad \cite{van2020survey,10.7551/mitpress/9780262033589.001.0001}. Una forma estándar de derivar esta penalización es introducir etiquetas latentes $\hat{y}_j\in\{-1,1\}$ para los ejemplos no etiquetados y añadir un término de pérdida \textit{hinge} $\max\bigl(0,1-\hat{y}_j f(\mathbf{x}_j)\bigr)$, que al minimizar respecto a $\hat{y}_j$ se convierte en $\max\bigl(0,1-|f(\mathbf{x}_j)|\bigr)$, conocida como \textit{hat loss} \cite{10.7551/mitpress/9780262033589.001.0001}.
 
 Con ello, una formulación típica de S3VM es
 \begin{equation}
-\min_{w,b} \quad \frac{1}{2}\|w\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(x_i)\bigr) + C^* \sum_{j=l+1}^{l+u} \max\bigl(0, 1 - |f(x_j)|\bigr).
+\min_{\mathbf{w},b} \quad \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(\mathbf{x}_i)\bigr) + C^* \sum_{j=l+1}^{l+u} \max\bigl(0, 1 - |f(\mathbf{x}_j)|\bigr).
 \end{equation}
 
-En términos del marco de la Sección \ref{sec:perdida_regularizacion}, el sumatorio sobre los datos no etiquetados puede interpretarse como un término adicional dependiente de $\{x_j\}$, que incorpora explícitamente la suposición de separación en baja densidad.
+En términos del marco de la Sección \ref{sec:perdida_regularizacion}, el sumatorio sobre los datos no etiquetados puede interpretarse como un término adicional dependiente de $\{\mathbf{x}_j\}$, que incorpora explícitamente la suposición de separación en baja densidad.
 
 En la práctica suele ser necesario imponer alguna restricción adicional (por ejemplo, sobre el balance de etiquetas asignadas a los datos no etiquetados) para evitar soluciones degeneradas \cite{van2020survey}. El problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados; además, si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
 
@@ -148,14 +150,14 @@ Este enfoque se ha popularizado especialmente en el contexto de las redes neuron
 
 Antes de proceder a exponer el método de las \textit{ladder networks}, repasamos brevemente el marco general de las redes neuronales, más concretamente el marco de las redes neuronales feedforward. 
 
-Una red neuronal es un sistema que transforma un vector de entrada $x\in\mathbb{R}^d$ en un vector de salida $f(x)\in\mathbb{R}^k$ mediante la propagación de la entrada por una serie de capas conectadas secuencialmente \cite{van2020survey}.
+Una red neuronal es un sistema que transforma un vector de entrada $\mathbf{x}\in\mathbb{R}^d$ en un vector de salida $f(\mathbf{x})\in\mathbb{R}^k$ mediante la propagación de la entrada por una serie de capas conectadas secuencialmente \cite{van2020survey}.
 
-Cada capa de la red se compone de un conjunto de perceptrones, un modelo matemático de neurona. Cada uno de estos perceptrones recibe como entrada un vector $z\in\mathbb{R}^m$, o bien el de entrada o bien las salidas de la capa anterior, y produce una salida escalar $a\in\mathbb{R}$ mediante la aplicación de una función de activación $\sigma:\mathbb{R}\to\mathbb{R}$ a una combinación lineal de las entradas, es decir, $a=\sigma(w^{\top}z+b)$, donde $w\in\mathbb{R}^m$ y $b\in\mathbb{R}$ son los parámetros del perceptrón \cite{bishop2006pattern}.
+Cada capa de la red se compone de un conjunto de perceptrones, un modelo matemático de neurona. Cada uno de estos perceptrones recibe como entrada un vector $\mathbf{z}\in\mathbb{R}^m$, o bien el de entrada o bien las salidas de la capa anterior, y produce una salida escalar $a\in\mathbb{R}$ mediante la aplicación de una función de activación $\sigma:\mathbb{R}\to\mathbb{R}$ a una combinación lineal de las entradas, es decir, $a=\sigma(\mathbf{w}^{\top}\mathbf{z}+b)$, donde $\mathbf{w}\in\mathbb{R}^m$ y $b\in\mathbb{R}$ son los parámetros del perceptrón \cite{bishop2006pattern}.
 
-En el contexto de aprendizaje supervisado, el entrenamiento de la red neuronal consiste en ajustar los parámetros de los perceptrones, representados por una matriz $W$ que contiene tanto los pesos $w$ como los sesgos $b$, para minimizar una función de pérdida \cite{van2020survey}.
+En el contexto de aprendizaje supervisado, el entrenamiento de la red neuronal consiste en ajustar los parámetros de los perceptrones, representados por una matriz $W$ que contiene tanto los pesos $\mathbf{w}$ como los sesgos $b$, para minimizar una función de pérdida \cite{van2020survey}.
 
 \begin{equation}
-    \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(x_i,y_i,f(x_i;W))
+    \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i;W))
 \end{equation}
 
 Los parámetros se optimizan iterativamente mediante la retropropagación del error, normalmente con un método de descenso de gradiente estocástico o alguna de sus variantes \cite{NIPS2014_f033ed80}.
@@ -168,10 +170,10 @@ En concreto, el modelo se estructura en un codificador y un decodificador. Duran
 
 La función de pérdida total a optimizar se puede formular de la siguiente manera:
 \begin{equation}
-    \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(x_i,y_i,f(x_i;W)) + \sum_{i=1}^{l+u} \sum_{k=1}^K ReconstructionLoss\bigl(\hat{z}_i^k, z_i^k\bigr)
+    \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i;W)) + \sum_{i=1}^{l+u} \sum_{k=1}^K ReconstructionLoss\bigl(\hat{\mathbf{z}}_i^k, \mathbf{z}_i^k\bigr)
 \end{equation}
 
-Donde $z_i^k$ es la activación oculta de la capa $k$ en el codificador para el ejemplo limpio $x_i$, mientras que $\hat{z}_i^k$ es la activación reconstruida por el decodificador a partir de la versión perturbada. Finalmente, $\text{ReconstructionLoss}$ es una función que penaliza la discrepancia entre ambas (como, por ejemplo, la norma $L_2$ al cuadrado) \cite{rasmus2015semi}.
+Donde $\mathbf{z}_i^k$ es la activación oculta de la capa $k$ en el codificador para el ejemplo limpio $\mathbf{x}_i$, mientras que $\hat{\mathbf{z}}_i^k$ es la activación reconstruida por el decodificador a partir de la versión perturbada. Finalmente, $\text{ReconstructionLoss}$ es una función que penaliza la discrepancia entre ambas (como, por ejemplo, la norma $L_2$ al cuadrado) \cite{rasmus2015semi}.
 
 A través de esta arquitectura, las \textit{ladder networks} consiguen aprovechar simultáneamente tanto la señal de los datos etiquetados como la regularización proporcionada por los datos no etiquetados\footnote{Esta simultaneidad es, de hecho, lo que hace a las \textit{ladder networks} modelos intrínsecos, a diferencia del preentrenamiento por capas visto en la Sección \ref{sec:pre-training}, donde se usaba un \textit{encoder-decoder} como fase inicial independiente seguida de la fase supervisada.}, forzando a la red a extraer características latentes útiles y robustas al ruido que, en última instancia, mejoran la generalización del modelo predictivo \cite{rasmus2015semi}.
 \section{Basados en variedades}
@@ -195,12 +197,15 @@ Para ello, un enfoque representativo es el presentado en \textit{On Manifold Reg
 
 donde el primer término es la pérdida de clasificación sobre los datos etiquetados y el segundo término es un regularizador que penaliza la complejidad de la función $f$ \cite{belkin2005manifold}.
 
-Además, se añade un término de regularización adicional, utilizando la matriz de pesos $W$ del grafo, que penaliza la falta de suavidad de $f$ respecto a la estructura del grafo:
+Finalmente, la información no etiquetada se introduce mediante un término de regularización adicional, utilizando la matriz de pesos $W$, que penaliza la falta de suavidad de $f$ respecto a la estructura del grafo:
 \begin{equation}
     \|f\|_I^2 = \frac{1}{2} \sum_{i,j} w_{ij} \bigl(f(\mathbf{x}_i) - f(\mathbf{x}_j)\bigr)^2,
 \end{equation}
 
-este se puede interpretar como una medida de la variación de $f$ a lo largo de las aristas del grafo, ponderada por los pesos de similitud. De este modo, la función de pérdida total a minimizar es
+Este término puede interpretarse como una medida de la variación de $f$ a lo largo de las aristas del grafo, ponderada por los pesos de similitud. Además, si denotamos $n=l+u$ y definimos el vector $\mathbf{f} = \bigl(f(\mathbf{x}_1),\dots,f(\mathbf{x}_n)\bigr)^{\top}$, la matriz diagonal de grados $D$ con $D_{ii}=\sum_j w_{ij}$ y el laplaciano no normalizado $L=D-W$, entonces se obtiene una expresión matricial compacta para él mismo $\|f\|_I^2 = \mathbf{f}^{\top} L \mathbf{f}$ \cite{belkin2005manifold}.
+
+De este modo, la función de pérdida total a minimizar es
+
 \begin{equation}
     \mathcal{L}(f) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i)) + \lambda_A \|f\|_K^2 + \lambda_I \|f\|_I^2,
 \end{equation}
