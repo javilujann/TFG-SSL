@@ -1,0 +1,92 @@
+\chapter{Métodos Transductivos}
+
+Hasta ahora, las familias de métodos presentadas en los capítulos anteriores eran \emph{inductivas}: su objetivo era construir un modelo a partir de los datos de entrenamiento y, posteriormente, usarlo para predecir la clase de nuevas instancias del espacio de entrada. En este capítulo se presentan métodos \emph{transductivos}, que en lugar de aprender una regla de decisión general, se centran en inferir la clase de las instancias no etiquetadas disponibles en el propio conjunto de entrenamiento \cite{van2020survey}.
+
+El enfoque transductivo aparece de manera natural en los métodos semi-supervisados basados en grafos. En ellos se construye un grafo de similitud donde cada nodo representa una instancia (etiquetada o no) y las aristas ponderadas codifican la proximidad entre pares de ejemplos. Estos métodos suelen asumir \emph{suavidad de etiquetas} sobre el grafo: si dos nodos están conectados por una arista con peso grande, entonces es razonable esperar que sus etiquetas (o puntuaciones de clase) sean similares \cite{zhu2005semi}.
+
+Esta idea es conceptualmente cercana a la de los métodos basados en variedades (véase la Sección \ref{sec: variedades}), donde el grafo se utiliza como una aproximación discreta de la geometría de los datos. La diferencia clave es que, en el planteamiento transductivo, la función de decisión se define \emph{directamente sobre los nodos} del grafo, de modo que el problema se reduce a propagar de forma coherente la información de las etiquetas conocidas hacia los nodos no etiquetados \cite{van2020survey}.
+
+Usando el marco de pérdida y regularización introducido en la Sección \ref{sec:perdida_regularizacion}, el aprendizaje transductivo sobre grafos puede formularse como la minimización de un término de ajuste en los nodos etiquetados más un término que penaliza la falta de suavidad sobre el grafo \cite{van2020survey,zhu2005semi}.
+
+\begin{equation}
+    \label{eq:minimizacionGrafos}
+    \min_{f} \; \sum_{i \in L} \ell\bigl(f(\mathbf{x}_i), y_i\bigr) + \lambda \sum_{i,j} w_{ij}\, \ell_U\bigl(f(\mathbf{x}_i), f(\mathbf{x}_j)\bigr)
+\end{equation}
+
+En esta expresión, $L$ denota el conjunto de índices etiquetados y $U$ el de no etiquetados (con $L\cup U=\{1,\dots,n\}$). Además, $w_{ij}\ge 0$ cuantifica la similitud entre $\mathbf{x}_i$ y $\mathbf{x}_j$ (y, por convenio, $w_{ij}=0$ cuando no existe arista entre ambos nodos), mientras que $\ell_U$ es una penalización que favorece predicciones similares en nodos conectados.
+
+\begin{rema}
+    Nótese la similitud con el enfoque visto en los métodos de regularización de variedades. La diferencia aquí es que, en el planteamiento puramente transductivo, no se busca controlar la complejidad de un modelo definido sobre todo el espacio de entrada, sino obtener predicciones coherentes para las instancias del conjunto de entrenamiento; si se desea extrapolar a ejemplos nuevos, se pasa a formulaciones inductivas como las de la Sección \ref{sec: variedades}.
+\end{rema}
+
+Por su propia estructura, estos métodos tienen dos partes claramente diferenciadas: la \textbf{construcción del grafo} de similitud (definir vecindades y pesos) y la \textbf{inferencia sobre el grafo} (obtener la asignación de etiquetas o la función $f$ en los nodos) \cite{van2020survey}. Pasemos entonces a abordar cada una de estas partes.
+
+\section{Construcción del grafo}
+
+La construcción del grafo constituye la fase inicial de los métodos basados en grafos y, en la práctica, suele ser un componente determinante: la calidad del grafo de similitud condiciona de manera directa el rendimiento del método de inferencia posterior \cite{van2020survey}. Dado que los nodos representan instancias del conjunto de entrenamiento, construir el grafo equivale a decidir (i) qué pares de nodos se conectan mediante aristas y (ii) qué peso (similitud) se asigna a cada una de ellas.
+
+\subsection{Construcción de la matriz de adyacencia}
+
+El primer paso de la construcción de un grafo de similitud es definir una matriz de adyacencia $A$, donde cada elemento $a_{ij}$ indica la existencia de una arista entre los nodos $i$ y $j$. Existen varias formas de construir esta matriz, siendo las más comunes:
+
+\begin{itemize}
+    \item \textbf{Grafo completo}: se conecta cada par de nodos, es decir, $a_{ij}=1$ para todo $i\neq j$ \cite{zhu2009introduction}. Aunque conceptualmente sencillo, suele ser impracticable por su coste computacional y rara vez se utiliza en problemas de tamaño medio o grande.
+    \item \textbf{Grafo de $\epsilon$-vecinos}: se conecta el nodo $i$ con el nodo $j$ si la distancia entre sus representaciones es menor que un umbral $\epsilon$, esto es, $a_{ij}=1$ si $d(\mathbf{x}_i,\mathbf{x}_j)<\epsilon$. Es un criterio simple, pero el grafo resultante depende fuertemente de la elección de $\epsilon$ y puede ser sensible a la escala de los datos \cite{van2020survey}.
+    \item \textbf{Grafo de $k$ vecinos más cercanos (k-NN)}: se conecta el nodo $i$ con el nodo $j$ si $j$ pertenece al conjunto de los $k$ vecinos más cercanos de $i$. En general, este procedimiento produce un grafo dirigido (puede ocurrir que $j$ sea vecino de $i$ sin que $i$ lo sea de $j$). Para obtener un grafo no dirigido se suele \emph{simetrizar} la vecindad, por ejemplo conectando $i$ y $j$ si $i$ es vecino de $j$ \emph{o} $j$ es vecino de $i$, o bien exigiendo que la vecindad sea recíproca. Es uno de los enfoques más utilizados en la práctica, aunque también requiere seleccionar el parámetro $k$ \cite{van2020survey}.
+    \item \textbf{Grafo mediante \textit{b-matching}}: mientras que los criterios anteriores son esencialmente locales, el \textit{b-matching} busca construir conexiones optimizando un objetivo global \cite{van2020survey}. De forma informal, se selecciona un conjunto de aristas que maximiza una medida de similitud agregada, sujeto a que cada nodo tenga a lo sumo $b$ conexiones. Puede producir grafos menos sensibles a parámetros locales, a costa de una implementación más compleja y un mayor coste computacional \cite{jebara2009graph}.
+\end{itemize}
+
+\subsection{Asignación de pesos}
+
+Una vez definida la estructura del grafo, el siguiente paso es asignar pesos a las aristas. Estos pesos reflejan la similitud entre los nodos conectados, y su elección puede afectar significativamente el rendimiento del método de inferencia \cite{van2020survey}. Algunas formas comunes de asignar pesos son:
+
+\begin{itemize}
+    \item \textbf{Asignación gaussiana}: Una forma común de asignar pesos es usar una función gaussiana de la distancia entre los nodos, es decir, 
+    \begin{equation}
+        w_{ij} = \exp(-\frac{\|\mathbf{x}_i - \mathbf{x}_j\|^2}{2\sigma^2})
+    \end{equation}
+    donde $\sigma$ es un parámetro que controla la velocidad de decaimiento de la similitud \cite{zhu2009introduction}. Este método es popular porque produce pesos que decaen suavemente con la distancia, pero requiere elegir el parámetro $\sigma$ de manera adecuada.
+
+    \item \textbf{Asignación gaussiana modificada}: Una variante de la anterior es usar una función gaussiana modificada que tenga en cuenta la densidad local de los datos, es decir,
+    \begin{equation}
+        w_{ij} = \exp(-\frac{\|\mathbf{x}_i - \mathbf{x}_j\|^2}{\max\{\sigma_i, \sigma_j\}^2})
+    \end{equation}
+    donde $\sigma_i$ y $\sigma_j$ son las distancias a los vecinos más cercanos de los nodos $i$ y $j$, respectivamente \cite{hein2006manifold}. 
+
+    \item \textbf{Propagación lineal de vecinos}: Los métodos anteriores asignan $w_{ij}$ a partir de una función explícita de la distancia entre dos nodos. Sin embargo, existen alternativas que incorporan información de todo el vecindario. Un ejemplo es asignar pesos imponiendo que cada instancia pueda aproximarse como una combinación lineal de sus vecinos, minimizando un error de reconstrucción \cite{van2020survey}:
+    \begin{equation}
+        \min_{\{w_{ij}\}} \sum_{i} \left\| \mathbf{x}_i - \sum_{j \in N(i)} w_{ij} \, \mathbf{x}_j \right\|^2
+    \end{equation}
+    sujeto a la restricción $\sum_{j \in N(i)} w_{ij} = 1$ para cada nodo $i$, donde $N(i)$ denota el conjunto de vecinos de $i$ en el grafo. Este enfoque puede producir pesos mejor adaptados a la estructura local de los datos, aunque conlleva un mayor coste computacional \cite{van2020survey}.
+\end{itemize}
+
+
+\section{Inferencia sobre el grafo}
+
+La construcción del grafo descrita en la sección anterior es necesaria siempre que se quiera explotar una noción de vecindad o geometría sobre el conjunto de entrenamiento; por lo que, también es un ingrediente central en los métodos de regularización de variedades (Sección \ref{sec: variedades}). La parte distintiva del enfoque transductivo es la \textbf{inferencia sobre el grafo}: dado el grafo de similitud y las etiquetas de un subconjunto de nodos, se trata de asignar etiquetas (o, más generalmente, una función de decisión) a los nodos no etiquetados, respetando la suavidad inducida por los pesos $w_{ij}$.
+
+Una vez fijado el grafo, muchos métodos de inferencia pueden interpretarse como instancias del problema de optimización de la Ecuación \ref{eq:minimizacionGrafos}, que combina (i) un término de ajuste a las etiquetas conocidas y (ii) un término de regularización que penaliza variaciones bruscas de $f$ entre nodos similares. La elección de las pérdidas $\ell$ y $\ell_U$, del parámetro $\lambda$ y del algoritmo para resolver el problema determina el método concreto \cite{van2020survey}. A continuación se presentan dos enfoques clásicos.
+
+\subsection{Mincut}
+
+El método \textit{mincut} (o \textit{s-t mincut}) se plantea típicamente para clasificación binaria y busca un corte del grafo que separe los nodos etiquetados positivos de los negativos minimizando la suma de pesos de las aristas cortadas \cite{zhu2009introduction}. Una vez fijado el corte, los nodos no etiquetados heredan la etiqueta del lado del corte al que quedan conectados.
+
+Atendiendo a la formulación de la Ecuación \ref{eq:minimizacionGrafos}, este método puede verse como la elección de una pérdida supervisada con peso infinito (equivalentemente, imponiendo como restricciones las etiquetas en $L$) junto con un término de suavidad cuadrático en el grafo. Una formulación habitual es
+
+\begin{equation}
+    \min_{f: f(\mathbf{x}_i)\in\{-1,1\}} \; \frac{1}{4} \sum_{i,j} w_{ij}\, \bigl(f(\mathbf{x}_i) - f(\mathbf{x}_j)\bigr)^2
+    \quad \text{s.a.}\quad f(\mathbf{x}_i)=y_i,\; i\in L.
+\end{equation}
+
+El enfoque tiene limitaciones conocidas: en su forma básica está restringido a clasificación binaria y puede presentar cortes degenerados o no únicos, lo que se traduce en soluciones inestables o poco informativas para los nodos no etiquetados \cite{zhu2009introduction,van2020survey}.
+
+\subsection{Funciones armónicas}
+
+La idea de este método es relajar el problema de \textit{mincut} permitiendo que, en los nodos no etiquetados, la función $f$ tome valores continuos (por ejemplo, puntuaciones en $\mathbb{R}$), manteniendo las etiquetas conocidas fijadas en $L$. Gracias a esta relajación, el problema se reduce a la minimización de una función cuadrática, lo que conduce a una solución cerrada\footnote{Es decir, tiene una forma explícita que se calcula resolviendo un sistema de ecuaciones lineales} que, bajo condiciones suaves, es única y óptima \cite{zhu2009introduction}.
+
+El nombre proviene de la conexión con las funciones armónicas: la solución satisface una condición de \emph{media ponderada} sobre el grafo. En particular, para cada nodo no etiquetado $i\in U$ se cumple \cite{van2020survey}:
+\begin{equation}
+    \sum_{j \in N(i)} w_{ij} (f(\mathbf{x}_i) - f(\mathbf{x}_j)) = 0
+\end{equation}
+
+equivalentemente, $f(\mathbf{x}_i)$ coincide con el promedio ponderado de sus vecinos, con pesos proporcionales a $w_{ij}$.

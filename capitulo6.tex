@@ -177,6 +177,7 @@ Donde $\mathbf{z}_i^k$ es la activación oculta de la capa $k$ en el codificador
 
 A través de esta arquitectura, las \textit{ladder networks} consiguen aprovechar simultáneamente tanto la señal de los datos etiquetados como la regularización proporcionada por los datos no etiquetados\footnote{Esta simultaneidad es, de hecho, lo que hace a las \textit{ladder networks} modelos intrínsecos, a diferencia del preentrenamiento por capas visto en la Sección \ref{sec:pre-training}, donde se usaba un \textit{encoder-decoder} como fase inicial independiente seguida de la fase supervisada.}, forzando a la red a extraer características latentes útiles y robustas al ruido que, en última instancia, mejoran la generalización del modelo predictivo \cite{rasmus2015semi}.
 \section{Basados en variedades}
+\label{sec: variedades}
 
 Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque (al igual que los métodos discriminativos) se centran en aprender una función de decisión, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
 
