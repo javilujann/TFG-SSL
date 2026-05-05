@@ -53,7 +53,7 @@ Una vez establecida la noción de pérdida individual, se puede definir una medi
 
 \begin{defi}[Riesgo]
 \label{def:riesgo}
-Dado un clasificador $f \in \mathcal{F}$ y una función de pérdida $c$, el \textbf{riesgo} o \textbf{error de generalización} de $f$ se define como la pérdida esperada bajo la distribución conjunta $P(\mathbf{x}, y)$:
+Dado un clasificador $f \in \mathcal{F}$\footnote{En esta sección $\mathcal{F}$ denota una familia de funciones arbitraria, más adelante se verá que normalmente en cada problema se considera una familia específica definida por un conjunto de parámetros} y una función de pérdida $c$, el \textbf{riesgo} o \textbf{error de generalización} de $f$ se define como la pérdida esperada bajo la distribución conjunta $P(\mathbf{x}, y)$:
 $$R(f) = \mathbb{E}_{(\mathbf{x},y) \sim P}\left[c(\mathbf{x}, y, f(\mathbf{x}))\right]$$
 El clasificador óptimo es aquel que minimiza el riesgo: $f^* = \arg\min_{f \in \mathcal{F}} R(f)$ \cite{zhu2009introduction}.
 \end{defi}
@@ -111,7 +111,7 @@ No obstante, para que el conocimiento sobre $p(\mathbf{x})$ sea realmente útil 
 Una vez presentados estos conceptos, se pueden entonces exponer cuáles son las suposiciones que permiten que los datos no etiquetados aporten información útil. Estas suposiciones se presentan tal y como aparecen en \textit{Semi-supervised learning, Chapelle et al., 2006} \cite{10.7551/mitpress/9780262033589.001.0001}:
 
 \begin{itemize}
-    \item \textbf{Suposición de suavidad (semi-supervisada)}: Si dos puntos $\mathbf{x}_1$ y $\mathbf{x}_2$ se encuentran en una región de alta densidad de $p(\mathbf{x})$ y están cercanos entre sí, entonces sus correspondientes salidas $y_1$ e $y_2$ también deben estarlo. Nótese la diferencia con la suposición de suavidad clásica del aprendizaje supervisado, que simplemente requiere que puntos cercanos tengan salidas cercanas: aquí la suavidad está modulada por la densidad, lo que significa que la función de predicción puede cambiar abruptamente en regiones de baja densidad.
+    \item \textbf{Suposición de suavidad (semi-supervisada)}: Si dos puntos $\mathbf{x}_1$ y $\mathbf{x}_2$ se encuentran en una región de alta densidad de $p(\mathbf{x})$ y están cercanos entre sí, entonces sus correspondientes salidas $y_1$ e $y_2$ también deben estarlo. A diferencia de la suposición de suavidad clásica del aprendizaje supervisado, que simplemente requiere que puntos cercanos tengan salidas cercanas: aquí la suavidad está modulada por la densidad, lo que significa que la función de predicción puede cambiar abruptamente en regiones de baja densidad.
     
     \item \textbf{Suposición de clústers}: Si dos puntos $\mathbf{x}_1$ y $\mathbf{x}_2$ pertenecen a un mismo clúster de $p(\mathbf{x})$, es probable que compartan la misma etiqueta, es decir, $p(y \mid \mathbf{x}_1) \approx p(y \mid \mathbf{x}_2)$. Bajo esta suposición, los datos no etiquetados, al revelar la estructura de clústers de $p(\mathbf{x})$, proporcionan información sobre las fronteras entre clases.
     
@@ -124,4 +124,4 @@ Una vez presentados estos conceptos, se pueden entonces exponer cuáles son las 
 Las suposiciones de clústers y de baja densidad, aunque equivalentes desde un punto de vista teórico, sugieren diferentes estrategias algorítmicas. La suposición de clústers lleva naturalmente a métodos que primero identifican la estructura de los datos (como los basados en grafos), mientras que la suposición de baja densidad sugiere métodos que buscan directamente fronteras de decisión en regiones de baja densidad (como los métodos de máximo margen).
 \end{rema}
 
-Destacar que si la suposición en la que se basa un método de aprendizaje semi-supervisado no se cumple, el uso de datos no etiquetados puede ser contraproducente y empeorar el rendimiento respecto al aprendizaje supervisado \cite{zhu2009introduction}. Este fenómeno, conocido informalmente como \textit{degradación del rendimiento}, subraya la importancia de verificar o al menos controlar la validez de las suposiciones a la hora de aplicar un método semi-supervisado a un problema concreto.
+Destacar que si la suposición en la que se basa un método de aprendizaje semi-supervisado no se cumple, el uso de datos no etiquetados puede ser contraproducente y empeorar el rendimiento respecto al aprendizaje supervisado \cite{zhu2009introduction}. Este fenómeno de degradación del rendimiento, subraya la importancia de verificar o al menos controlar la validez de las suposiciones a la hora de aplicar un método semi-supervisado a un problema concreto.

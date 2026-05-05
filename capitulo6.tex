@@ -96,7 +96,7 @@ donde $\mathbf{w}\in\mathbb{R}^d$ y $b\in\mathbb{R}$ \cite{zhu2009introduction}.
 \end{equation}
 mientras que la predicción se obtiene con $\mathrm{sign}(f(\mathbf{x}))$.
 
-La distancia (no firmada) de un punto $\mathbf{x}$ a dicho hiperplano es $\frac{|f(\mathbf{x})|}{\|\mathbf{w}\|}$, y para los ejemplos etiquetados se toma la distancia con signo que es $\frac{y_i f(\mathbf{x}_i)}{\|\mathbf{w}\|}$. Con todo esto, el margen geométrico del clasificador se define como
+La distancia sin signo de un punto $\mathbf{x}$ a dicho hiperplano es $\frac{|f(\mathbf{x})|}{\|\mathbf{w}\|}$, y para los ejemplos etiquetados se toma la distancia con signo que es $\frac{y_i f(\mathbf{x}_i)}{\|\mathbf{w}\|}$. Con todo esto, el margen geométrico del clasificador se define como
 \begin{equation}
 \gamma = \min_{i=1,\dots,l} \frac{y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)}{\|\mathbf{w}\|}.
 \end{equation}
@@ -105,7 +105,7 @@ Primero, vamos a asumir que los datos son \textit{linealmente separables}, es de
 \max_{\mathbf{w},b} \quad \min_{i=1,\dots,l} \frac{y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)}{\|\mathbf{w}\|}.
 \end{equation}
 
-Este problema es invariante frente a escalado: si multiplicamos $(\mathbf{w},b)$ por una constante $c>0$, la frontera de decisión $\{\mathbf{x}: \mathbf{w}^{\top}\mathbf{x}+b=0\}$ no cambia. Por ello, podemos fijar una escala imponiendo $\min_i y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)=1$, equivalente a exigir $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)\ge 1$ para todo $i$. En consecuencia, maximizar el margen es equivalente a maximizar $\frac{1}{\|\mathbf{w}\|}$, o de forma equivalente minimizar la norma de $\mathbf{w}$:
+Este problema es invariante frente a escalado, es decir, si multiplicamos $(\mathbf{w},b)$ por una constante $c>0$, la frontera de decisión $\{\mathbf{x}: \mathbf{w}^{\top}\mathbf{x}+b=0\}$ no cambia. Para evitar esto, podemos fijar una escala imponiendo que $\min_i y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)=1$. En consecuencia, maximizar el margen es equivalente a maximizar $\frac{1}{\|\mathbf{w}\|}$ exigiendo $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)\ge 1$ para todo $i$. Finalmente, podemos trasladarlo a un problema de minimización, a traves de la norma de $\mathbf{w}$:
 \begin{equation}
 \begin{aligned}
 \min_{\mathbf{w},b} \quad & \frac{1}{2}\|\mathbf{w}\|^2 \\
@@ -113,7 +113,7 @@ Este problema es invariante frente a escalado: si multiplicamos $(\mathbf{w},b)$
 \end{aligned}
 \end{equation}
 
-Cuando los datos no son separables (esto es, no existe un hiperplano que separe perfectamente las clases), se introduce el \textit{soft margin} mediante variables de holgura $\xi_i\ge 0$ y un parámetro $C>0$ que controla el compromiso entre maximizar el margen y minimizar errores. Intuitivamente, $\xi_i$ mide cuánto viola el ejemplo $i$ la restricción de margen: $\xi_i=0$ significa que se cumple el margen, $0<\xi_i<1$ indica que el punto queda dentro del margen pero sigue estando bien clasificado, y $\xi_i>1$ corresponde a una clasificación errónea.
+Ahora, si los datos no son separables (esto es, no existe un hiperplano que separe perfectamente las clases), se introduce el \textit{soft margin} mediante variables de holgura $\xi_i\ge 0$ y un parámetro $C>0$ que controla el compromiso entre maximizar el margen y minimizar errores, tal y como se muestra a continuación.
 \begin{equation}
 \begin{aligned}
 \min_{\mathbf{w},b} \quad & \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \xi_i \\
@@ -122,7 +122,9 @@ Cuando los datos no son separables (esto es, no existe un hiperplano que separe 
 \end{aligned}
 \end{equation}
 
-Finalmente, puede expresarse en el marco de la minimización de riesgo regularizado (Sección \ref{sec:perdida_regularizacion}). Despejando $\xi_i$ de $y_i f(\mathbf{x}_i) \ge 1-\xi_i$ obtenemos $\xi_i\ge 1-y_if(\mathbf{x}_i)$, y junto con $\xi_i\ge 0$ se tiene $\xi_i=\max\bigl(0,1-y_if(\mathbf{x}_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
+ Intuitivamente, $\xi_i$ mide cuánto viola el ejemplo $i$ la restricción de margen: $\xi_i=0$ significa que se cumple el margen, $0<\xi_i<1$ indica que el punto queda dentro del margen pero sigue estando bien clasificado, y $\xi_i>1$ corresponde a una clasificación errónea.  
+
+Finalmente, con el fin de expresar el problema en el marco de la minimización de riesgo regularizado (Sección \ref{sec:perdida_regularizacion}). Se puede despejar $\xi_i$ de $y_i f(\mathbf{x}_i) \ge 1-\xi_i$ obteniendo $\xi_i\ge 1-y_if(\mathbf{x}_i)$, que junto a $\xi_i\ge 0$ es equivalente a $\xi_i=\max\bigl(0,1-y_if(\mathbf{x}_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
 \begin{equation}
 \min_{\mathbf{w},b} \quad \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(\mathbf{x}_i)\bigr).
 \end{equation}
@@ -130,16 +132,16 @@ En este caso la función de pérdida es $c(\mathbf{x},y,f(\mathbf{x})) = \max\bi
 
 \subsubsection{S3VM}
 
-La idea central de las S3VM es incorporar un conjunto no etiquetado $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ penalizando que dichos puntos queden cerca de la frontera: se prefiere que $|f(\mathbf{x}_j)|$ sea grande, de modo que la frontera se sitúe en regiones de baja densidad \cite{van2020survey,10.7551/mitpress/9780262033589.001.0001}. Una forma estándar de derivar esta penalización es introducir etiquetas latentes $\hat{y}_j\in\{-1,1\}$ para los ejemplos no etiquetados y añadir un término de pérdida \textit{hinge} $\max\bigl(0,1-\hat{y}_j f(\mathbf{x}_j)\bigr)$, que al minimizar respecto a $\hat{y}_j$ se convierte en $\max\bigl(0,1-|f(\mathbf{x}_j)|\bigr)$, conocida como \textit{hat loss} \cite{10.7551/mitpress/9780262033589.001.0001}.
+La idea central de las S3VM es incorporar el conjunto no etiquetado $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ penalizando que dichos puntos queden cerca de la frontera, i.e., se prefiere que $|f(\mathbf{x}_j)|$ sea grande, de modo que la frontera se sitúe en regiones de baja densidad \cite{van2020survey,10.7551/mitpress/9780262033589.001.0001}. Una forma estándar de derivar esta penalización es introducir etiquetas latentes $\hat{y}_j\in\{-1,1\}$ para los ejemplos no etiquetados y añadir un término de pérdida \textit{hinge} $\max\bigl(0,1-\hat{y}_j f(\mathbf{x}_j)\bigr)$, que como los puntos se suponen \textit{correctamente} clasificados se convierte en $\max\bigl(0,1-|f(\mathbf{x}_j)|\bigr)$, conocida como \textit{hat loss} \cite{10.7551/mitpress/9780262033589.001.0001}.
 
 Con ello, una formulación típica de S3VM es
 \begin{equation}
 \min_{\mathbf{w},b} \quad \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(\mathbf{x}_i)\bigr) + C^* \sum_{j=l+1}^{l+u} \max\bigl(0, 1 - |f(\mathbf{x}_j)|\bigr).
 \end{equation}
 
-En términos del marco de la Sección \ref{sec:perdida_regularizacion}, el sumatorio sobre los datos no etiquetados puede interpretarse como un término adicional dependiente de $\{\mathbf{x}_j\}$, que incorpora explícitamente la suposición de separación en baja densidad.
+En términos del marco de la Sección \ref{sec:perdida_regularizacion}, el sumatorio sobre los datos no etiquetados puede interpretarse como un funcional no supervisado, que incorpora explícitamente la suposición de separación en baja densidad.
 
-En la práctica suele ser necesario imponer alguna restricción adicional (por ejemplo, sobre el balance de etiquetas asignadas a los datos no etiquetados) para evitar soluciones degeneradas \cite{van2020survey}. El problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados; además, si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
+En la práctica suele ser necesario imponer alguna restricción adicional (por ejemplo, sobre el balance de etiquetas asignadas a los datos no etiquetados) para evitar soluciones degeneradas \cite{van2020survey}. Además, el problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados. Finalmente, destacar que si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
 
 \subsection{Basados en perturbaciones}
 Por otra parte, los métodos basados en perturbaciones se fundamentan en la suposición de suavidad: puntos cercanos en el espacio de entrada deberían tener etiquetas similares \cite{10.7551/mitpress/9780262033589.001.0001}. Para aprovechar esta suposición, se introducen perturbaciones o ruido estocástico en los datos de entrenamiento y se añade un término de regularización por consistencia a la función de pérdida. Este término penaliza que el modelo produzca predicciones diferentes para las versiones original y perturbada de un mismo ejemplo \cite{van2020survey}.
@@ -215,4 +217,4 @@ donde $\lambda_A$ y $\lambda_I$ son hiperparámetros que controlan el peso relat
 
 Dependiendo de la elección del kernel $K$ y de la función de pérdida $c$, esta formulación puede dar lugar a diferentes algoritmos concretos. Un ejemplo clásico son las \textit{Laplacian SVM}, que combinan una pérdida \textit{hinge} con el término de regularización basado en el grafo. De este modo, a diferencia de las S3VM vistas en la sección anterior, la información no etiquetada se incorpora a través de la geometría del grafo y no mediante la penalización directa de puntos cercanos a la frontera de decisión \cite{van2020survey}.
 
-En la práctica, estos métodos pueden ser costosos computacionalmente, ya que suelen requerir operar con matrices de tamaño $n\times n$ (donde $n=l+u$). En particular, en algunos casos el coste puede alcanzar $O(n^3)$, o bien $O(c\,n^2)$ para un $c \ll n$ \cite{van2020survey}. Además, el rendimiento es muy sensible a cómo se construye el grafo y a la elección y escala de los pesos $w_{ij}$; si el grafo no refleja bien la geometría de los datos, la información no etiquetada puede propagarse de forma perjudicial \cite{zhu2009introduction}.
+En la práctica, estos métodos pueden ser costosos computacionalmente, ya que suelen requerir operar con matrices de tamaño $n\times n$ (donde $n=l+u$). En particular, en algunos casos el coste puede alcanzar $O(n^3)$, o bien $O(n^2)$ \cite{van2020survey}. Además, el rendimiento es muy sensible a cómo se construye el grafo y a la elección y escala de los pesos $w_{ij}$; si el grafo no refleja bien la geometría de los datos, la información no etiquetada puede propagarse de forma perjudicial \cite{zhu2009introduction}.
