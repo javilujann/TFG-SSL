@@ -105,7 +105,7 @@ Primero, vamos a asumir que los datos son \textit{linealmente separables}, es de
 \max_{\mathbf{w},b} \quad \min_{i=1,\dots,l} \frac{y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)}{\|\mathbf{w}\|}.
 \end{equation}
 
-Este problema es invariante frente a escalado, es decir, si multiplicamos $(\mathbf{w},b)$ por una constante $c>0$, la frontera de decisión $\{\mathbf{x}: \mathbf{w}^{\top}\mathbf{x}+b=0\}$ no cambia. Para evitar esto, podemos fijar una escala imponiendo que $\min_i y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)=1$. En consecuencia, maximizar el margen es equivalente a maximizar $\frac{1}{\|\mathbf{w}\|}$ exigiendo $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)\ge 1$ para todo $i$. Finalmente, podemos trasladarlo a un problema de minimización, a traves de la norma de $\mathbf{w}$:
+Este problema es invariante frente a escalado, es decir, si multiplicamos $(\mathbf{w},b)$ por una constante $c>0$, la frontera de decisión $\{\mathbf{x}: \mathbf{w}^{\top}\mathbf{x}+b=0\}$ no cambia. Para evitar esto, podemos fijar una escala imponiendo que $\min_i y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)=1$. En consecuencia, maximizar el margen es equivalente a maximizar $\frac{1}{\|\mathbf{w}\|}$ exigiendo $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)\ge 1$ para todo $i$. Finalmente, podemos trasladarlo a un problema de minimización, a través de la norma de $\mathbf{w}$:
 \begin{equation}
 \begin{aligned}
 \min_{\mathbf{w},b} \quad & \frac{1}{2}\|\mathbf{w}\|^2 \\
@@ -122,7 +122,7 @@ Ahora, si los datos no son separables (esto es, no existe un hiperplano que sepa
 \end{aligned}
 \end{equation}
 
- Intuitivamente, $\xi_i$ mide cuánto viola el ejemplo $i$ la restricción de margen: $\xi_i=0$ significa que se cumple el margen, $0<\xi_i<1$ indica que el punto queda dentro del margen pero sigue estando bien clasificado, y $\xi_i>1$ corresponde a una clasificación errónea.  
+Intuitivamente, $\xi_i$ mide cuánto viola el ejemplo $i$ la restricción de margen: $\xi_i=0$ significa que se cumple el margen, $0<\xi_i<1$ indica que el punto queda dentro del margen pero sigue estando bien clasificado, y $\xi_i>1$ corresponde a una clasificación errónea.  
 
 Finalmente, con el fin de expresar el problema en el marco de la minimización de riesgo regularizado (Sección \ref{sec:perdida_regularizacion}). Se puede despejar $\xi_i$ de $y_i f(\mathbf{x}_i) \ge 1-\xi_i$ obteniendo $\xi_i\ge 1-y_if(\mathbf{x}_i)$, que junto a $\xi_i\ge 0$ es equivalente a $\xi_i=\max\bigl(0,1-y_if(\mathbf{x}_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
 \begin{equation}
@@ -179,7 +179,7 @@ Donde $\mathbf{z}_i^k$ es la activación oculta de la capa $k$ en el codificador
 
 A través de esta arquitectura, las \textit{ladder networks} consiguen aprovechar simultáneamente tanto la señal de los datos etiquetados como la regularización proporcionada por los datos no etiquetados\footnote{Esta simultaneidad es, de hecho, lo que hace a las \textit{ladder networks} modelos intrínsecos, a diferencia del preentrenamiento por capas visto en la Sección \ref{sec:pre-training}, donde se usaba un \textit{encoder-decoder} como fase inicial independiente seguida de la fase supervisada.}, forzando a la red a extraer características latentes útiles y robustas al ruido que, en última instancia, mejoran la generalización del modelo predictivo \cite{rasmus2015semi}.
 \section{Basados en variedades}
-\label{sec: variedades}
+\label{sec:variedades}
 
 Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque (al igual que los métodos discriminativos) se centran en aprender una función de decisión, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
 
