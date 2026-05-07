@@ -197,7 +197,7 @@ Usualmente se denota por $W=(w_{ij})$ a la matriz de pesos, y la intuición es q
 
 Una vez construido el grafo, se busca una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ que no solo clasifique correctamente los ejemplos etiquetados, sino que también sea suave respecto a la estructura del grafo; es decir, que produzca salidas similares en nodos conectados por aristas con pesos altos \cite{zhu2009introduction}.
 
-Para ello, un enfoque representativo es el presentado en \textit{On Manifold Regularization, Belkin et al., 2005} \cite{belkin2005manifold}. Partiendo de un marco de aprendizaje supervisado, se considera un kernel $K$, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Y se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
+Para ello, un enfoque representativo es el propuesto por \citet{belkin2005manifold}. Partiendo de un marco de aprendizaje supervisado, se considera un kernel $K$, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Y se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
 
 \begin{equation}
     \mathcal{L}(f) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i)) + \lambda \|f\|_K^2,

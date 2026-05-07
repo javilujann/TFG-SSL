@@ -3,6 +3,10 @@
 \usepackage[utf8]{inputenc}
 % Paquete para personalizar el idioma.
 \usepackage[english,spanish]{babel}
+% Citas autor-año y comandos \citet / \citep
+\usepackage[numbers]{natbib}
+% Mantener \cite numerica y forzar \citet en formato narrativo Autor (A\~no)
+\renewcommand{\citet}[1]{\citeauthor{#1}~(\citeyear{#1})}
 % Paquetes de fuentes
 \usepackage{mathptmx}
 \usepackage{helvet}
@@ -34,11 +38,11 @@
 
 \begin{document}
 
+\frontmatter
 \input{portada.tex}
 
 \input{agradecimientos.tex}
 
-\frontmatter
 \pagestyle{fancyplain}
 
 \tableofcontents
@@ -67,7 +71,7 @@
 
 \printnoidxglossary[type=\acronymtype,title=Acrónimos]
 
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{bibliografia}
 
 \end{document}

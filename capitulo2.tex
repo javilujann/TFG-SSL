@@ -5,7 +5,7 @@ En este capítulo se da un enfoque formal a los conceptos introducidos en el cap
 \section{Problema de clasificación semi-supervisado}
 \label{sec:problema_clasificacion}
 
-Una vez introducida la idea en la que se basa el \gls{SSL}, y dado que este trabajo se va a centrar en su aplicación a problemas de clasificación, es necesario definir de manera formal este problema. Para ello, vamos a hacer uso de una serie de definiciones que se encuentran en el libro de  \textit{Introduction to Semi-Supervised Learning, Xiaojin Zhu y Goldberg, 2009} \cite{zhu2009introduction}, y que se presentan a continuación.
+Una vez introducida la idea en la que se basa el \gls{SSL}, y dado que este trabajo se va a centrar en su aplicación a problemas de clasificación, es necesario definir de manera formal este problema. Para ello, vamos a hacer uso de una serie de definiciones que se encuentran en \citet{zhu2009introduction}, y que se presentan a continuación.
 
 Como primer paso se presenta la definición de \gls{SL}, que, como se ha mencionado, es la base del \gls{SSL}:
 
@@ -38,7 +38,7 @@ Con estas definiciones, queda establecido el problema sobre el que se articula e
 \section{Funciones de pérdida y regularización}
 \label{sec:perdida_regularizacion}
 
-Una vez definido el problema de clasificación semi-supervisada, es necesario introducir los conceptos fundamentales que permiten formalizar el proceso de aprendizaje. En particular, se necesita un mecanismo para medir la calidad de las predicciones de un clasificador y un criterio para seleccionar el mejor clasificador. Las definiciones que se presentan a continuación se basan en las formulaciones de \textit{Introduction to Semi-Supervised Learning, Zhu y Goldberg, 2009} \cite{zhu2009introduction} y \textit{Foundations of Machine Learning, Mohri et al., 2018} \cite{mohri2018foundations}.
+Una vez definido el problema de clasificación semi-supervisada, es necesario introducir los conceptos fundamentales que permiten formalizar el proceso de aprendizaje. En particular, se necesita un mecanismo para medir la calidad de las predicciones de un clasificador y un criterio para seleccionar el mejor clasificador. Las definiciones que se presentan a continuación se basan en las formulaciones de \citet{zhu2009introduction} y \citet{mohri2018foundations}.
 
 \begin{defi}[Función de pérdida]
 \label{def:perdida}
@@ -114,7 +114,7 @@ No obstante, para que el conocimiento sobre $p(\mathbf{x})$ sea realmente útil 
 \item \textbf{Variedad (\textit{manifold}):} Un espacio topológico $\mathcal{M}$ que es localmente homeomorfo a $\mathbb{R}^d$, es decir, para cada punto $p \in \mathcal{M}$ existe un entorno abierto $U \text{ tal que } p \in U$ y un homeomorfismo $\varphi: U \to V \subseteq \mathbb{R}^d$. En el contexto de este trabajo, se considera que los datos residen en (o cerca de) una variedad $\mathcal{M}$ de dimensión $d$ sumergida en el espacio de entrada $\mathcal{X} \subseteq \mathbb{R}^D$ con $d \ll D$ \cite{10.7551/mitpress/9780262033589.001.0001}.
 \end{itemize}
 
-Una vez presentados estos conceptos, se pueden entonces exponer cuáles son las suposiciones que permiten que los datos no etiquetados aporten información útil. Estas suposiciones se presentan tal y como aparecen en \textit{Semi-supervised learning, Chapelle et al., 2006} \cite{10.7551/mitpress/9780262033589.001.0001}:
+Una vez presentados estos conceptos, se pueden entonces exponer cuáles son las suposiciones que permiten que los datos no etiquetados aporten información útil. Estas suposiciones se presentan tal y como aparecen en \citet{10.7551/mitpress/9780262033589.001.0001}:
 
 \begin{itemize}
     \item \textbf{Suposición de suavidad (semi-supervisada)}: Si dos puntos $\mathbf{x}_1$ y $\mathbf{x}_2$ se encuentran en una región de alta densidad de $p(\mathbf{x})$ y están cercanos entre sí, entonces sus correspondientes salidas $y_1$ e $y_2$ también deben estarlo. A diferencia de la suposición de suavidad clásica del aprendizaje supervisado, que simplemente requiere que puntos cercanos tengan salidas cercanas: aquí la suavidad está modulada por la densidad, lo que significa que la función de predicción puede cambiar abruptamente en regiones de baja densidad.

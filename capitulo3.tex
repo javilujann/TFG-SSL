@@ -1,6 +1,6 @@
 \chapter{Taxonomía de métodos de aprendizaje semi-supervisado}
 
-En este capítulo se va a presentar una taxonomía de los diferentes métodos de clasificación bajo el enfoque de \gls{SSL}. Su objetivo es permitir un entendimiento claro de la base de los diferentes métodos con el fin de facilitar su comprensión y estudio. Para realizarla se ha utilizado como estructura principal la taxonomía presentada en el artículo \textit{A survey on Semi-supervised Learning, van Engelen y Hoos, 2020} \cite{van2020survey} a la que se le han realizado ciertas modificaciones debidamente motivadas buscando una mejor comprensión y adaptación a los objetivos de este trabajo.
+En este capítulo se va a presentar una taxonomía de los diferentes métodos de clasificación bajo el enfoque de \gls{SSL}. Su objetivo es permitir un entendimiento claro de la base de los diferentes métodos con el fin de facilitar su comprensión y estudio. Para realizarla se ha utilizado como estructura principal la taxonomía presentada en \citet{van2020survey}, a la que se le han realizado ciertas modificaciones debidamente motivadas buscando una mejor comprensión y adaptación a los objetivos de este trabajo.
 
 \section{Características discriminantes}
 
@@ -9,7 +9,7 @@ Antes de exponer la taxonomía, se van a introducir posibles características di
 \subsection{Suposición sobre la relación entre los datos etiquetados y no etiquetados}
 \label{sec:div-x-suposiciones}
 
-Como se explicó al final del último capítulo las diferentes suposiciones sobre cómo se relacionan los datos etiquetados y no etiquetados es una característica básica a la hora de entender los diferentes métodos de \gls{SSL}. Es por esto que surge rápidamente como una posible característica discriminante a la hora de clasificar los diferentes métodos, como por ejemplo se hace en \textit{Semi-supervised learning, Chapelle et al., 2006}  \cite{10.7551/mitpress/9780262033589.001.0001}.
+Como se explicó al final del último capítulo las diferentes suposiciones sobre cómo se relacionan los datos etiquetados y no etiquetados es una característica básica a la hora de entender los diferentes métodos de \gls{SSL}. Es por esto que surge rápidamente como una posible característica discriminante a la hora de clasificar los diferentes métodos, como por ejemplo se hace en \citet{10.7551/mitpress/9780262033589.001.0001}.
 
 Sin embargo, clasificar en base a esta característica no es ni tan sencillo ni tan claro como parece a primera vista. Por un lado, las suposiciones teóricas a menudo se solapan conceptualmente, o son compartidas por diferentes algoritmos cuya implementación matemática difiere radicalmente. Además, hay ciertos algoritmos de \gls{SSL} -- como los métodos \textit{wrapper,} que se presentarán más adelante--, que no se basan en suposiciones explícitas sobre los datos, por lo que una clasificación por esta característica resulta incompleta.  Por tanto, aunque es importante conocer la suposición de cada algoritmo a la hora de trabajar con él, una clasificación en base a esta característica puede no resultar suficientemente esclarecedora para entender las ideas y fundamentos en los que se basa.
 
@@ -32,7 +32,7 @@ Esta distinción es muy útil pues permite comprender los fundamentos que hay de
 \subsection{Basado en el uso de los datos no etiquetados}
 \label{sec:div-uso-etiquetas}
 
-Finalmente, se presenta una última característica discriminante, la forma en la que los diferentes algoritmos hacen uso de los datos no etiquetados. Esta característica es la base de la taxonomía que se presenta en el trabajo de van Engelen y Hoos \cite{van2020survey}, y por ende es la base de la taxonomía presentada en este trabajo.
+Finalmente, se presenta una última característica discriminante, la forma en la que los diferentes algoritmos hacen uso de los datos no etiquetados. Esta característica es la base de la taxonomía que se presenta en el trabajo de \citet{van2020survey}, y por ende es la base de la taxonomía presentada en este trabajo.
 
 Esta característica clasifica los algoritmos de \gls{SSL} en tres grupos: 
 \begin{itemize}
@@ -53,11 +53,11 @@ Basándose en todo lo explicado anteriormente, se presenta en la figura \ref{fig
     \item Finalmente, dentro de los métodos inductivos e intrínsecamente semi-supervisados, se realiza una última distinción basada en el fundamento matemático del método, distinguiendo entre métodos generativos y discriminantes, añadiendo además una tercera rama para los métodos geométricos (basados en variedades).
 \end{enumerate}
 
-Cabe notar, como se viene comentando, la similitud entre esta taxonomía y la presentada en el trabajo de van Engelen y Hoos \cite{van2020survey}. Se va primero a explicar las similitudes, que son las que forman la base de la taxonomía presentada, para posteriormente explicar las diferencias que hay entre ambas.
+Cabe notar, como se viene comentando, la similitud entre esta taxonomía y la presentada en \citet{van2020survey}. Se va primero a explicar las similitudes, que son las que forman la base de la taxonomía presentada, para posteriormente explicar las diferencias que hay entre ambas.
 
 La primera similitud es la división inicial de la taxonomía en métodos inductivos y transductivos, esta división, estándar de facto en la literatura, es, como se ha comentado en la sección \ref{sec:div-inductivo-transductivo}, crucial para entender el objetivo final de un método y por tanto es lo primero que se ha de tener en cuenta a la hora de abordar un método de \gls{SSL}. 
 
-La segunda similitud, y la base de la taxonomía de van Engelen y Hoos \cite{van2020survey}, es la división de los métodos inductivos en base a cómo hacen uso de los datos no etiquetados. Esta división, como se ha comentado en la sección \ref{sec:div-uso-etiquetas}, permite entender la estructura general detrás de un método, siendo una herramienta muy útil para comprender de antemano un método o algoritmo.  
+La segunda similitud, y la base de la taxonomía de \citet{van2020survey}, es la división de los métodos inductivos en base a cómo hacen uso de los datos no etiquetados. Esta división, como se ha comentado en la sección \ref{sec:div-uso-etiquetas}, permite entender la estructura general detrás de un método, siendo una herramienta muy útil para comprender de antemano un método o algoritmo.  
 
 Estas similitudes fundamentan la base de una taxonomía sólida y clara, que permite entender cómo va a actuar de manera general un método, sin necesidad de abordar los detalles matemáticos del mismo. 
 
@@ -76,5 +76,5 @@ Además de esta diferencia, se han añadido dos cambios menores:
 
 Por un lado, para mantener la simetría entre los métodos inductivos y transductivos, se ha añadido en la rama de los métodos transductivos la división sobre el uso de los datos no etiquetados, aunque en este caso solo hay algoritmos intrínsecamente \gls{SSL}. De esta manera se mantiene la simetría entre ambas ramas, y permite tener una mayor comprensión con tan solo ver la figura.
 
-Por último, dentro de los métodos envolventes, se ha cambiado el nombre de la familia presentada por van Engelen y Hoos \cite{van2020survey} como co-training por \textit{métodos basados en desacuerdo}. De esta manera, se evita nombrar a la familia por un algoritmo en concreto dentro de esta, el algoritmo de co-training de Blum y Mitchell \cite{blum1998combining}. El objetivo del nuevo nombre, que se desarrollará en profundidad en el siguiente capítulo, es reflejar la idea general de esta familia de métodos tal y como se presenta en el trabajo de Zhou y Li \cite{zhou2010semi}.
+Por último, dentro de los métodos envolventes, se ha cambiado el nombre de la familia presentada por \citet{van2020survey} como co-training por \textit{métodos basados en desacuerdo}. De esta manera, se evita nombrar a la familia por un algoritmo en concreto dentro de esta, el algoritmo de co-training de \citet{blum1998combining}. El objetivo del nuevo nombre, que se desarrollará en profundidad en el siguiente capítulo, es reflejar la idea general de esta familia de métodos tal y como se presenta en el trabajo de \citet{zhou2010semi}.
 
