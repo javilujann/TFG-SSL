@@ -10,7 +10,7 @@ Una vez introducida la idea en la que se basa el \gls{SSL}, y dado que este trab
 Como primer paso se presenta la definición de \gls{SL}, que, como se ha mencionado, es la base del \gls{SSL}:
 
 \begin{defi}[\gls{SL}]
-Sea $\mathcal{X}$ el dominio de las instancias, e $\mathcal{Y}$ el dominio de las etiquetas. Sea $P(\mathbf{x},y)$ una distribución de probabilidad conjunta (desconocida) sobre las instancias y etiquetas $\mathcal{X} \times \mathcal{Y}$. Dado un conjunto de entrenamiento $\{(\mathbf{x}_i, y_i)\}_{i=1}^n$ con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ (independiente e idénticamente distribuido), el \gls{SL} entrena, usando este conjunto, una función, a la que se le suele denominar modelo\footnote{A lo largo de este trabajo, los términos modelo y algoritmo se utilizarán de manera intercambiable. No obstante, en sentido estricto, el modelo hace referencia a la función matemática (o hipótesis) que evalúa un vector de entrada para predecir una etiqueta, mientras que el algoritmo (de aprendizaje) es el procedimiento de optimización empleado para ajustar los parámetros de dicha función a partir del conjunto de entrenamiento.}, $f : \mathcal{X} \to \mathcal{Y}$ en alguna familia de funciones $\mathcal{F}$, con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ también.
+Sea $\mathcal{X}$ el dominio de las instancias, e $\mathcal{Y}$ el dominio de las etiquetas. Sea $P(\mathbf{x},y)$ una distribución de probabilidad conjunta (desconocida) sobre las instancias y etiquetas $\mathcal{X} \times \mathcal{Y}$. Dado un conjunto de entrenamiento $\{(\mathbf{x}_i, y_i)\}_{i=1}^n$ con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ (independiente e idénticamente distribuido), el \gls{SL} obtiene usando este conjunto, una función, a la que se le suele denominar modelo\footnote{A lo largo de este trabajo, los términos modelo y algoritmo se utilizarán de manera intercambiable. No obstante, en sentido estricto, el modelo hace referencia a la función matemática que evalúa un vector de entrada para predecir una etiqueta, mientras que el algoritmo (de aprendizaje) es el procedimiento de optimización utilizado para obtener dicha función a partir del conjunto de entrenamiento, generalmente ajustando sus parámetros.}, $f : \mathcal{X} \to \mathcal{Y}$ , con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ también.
 \end{defi}
 
 A partir de esta definición de \gls{SL}, se puede entonces definir el problema de clasificación:
@@ -22,7 +22,7 @@ La clasificación es el problema de aprendizaje supervisado con clases discretas
 Finalmente, podemos definir el problema de clasificación semi-supervisado como una extensión del supervisado de la siguiente manera:
 
 \begin{defi}[Clasificación Semi-Supervisada]
-Bajo las condiciones de \gls{SL}, se expande el conjunto de entrenamiento para que consista tanto en $l$ instancias etiquetadas $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$, con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$,  como en $u$ instancias no etiquetadas $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$, con $(\mathbf{x}_j) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x})$, siendo este término la distribución marginal de $P(\mathbf{x},y)$ relativa al dominio de las instancias. El objetivo sigue siendo entrenar una función $f : \mathcal{X} \to \mathcal{Y}$ en alguna familia de funciones $\mathcal{F}$, con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$.
+Bajo las condiciones de \gls{SL}, se expande el conjunto de entrenamiento para que consista tanto en $l$ instancias etiquetadas $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$, con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$,  como en $u$ instancias no etiquetadas $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$, con $(\mathbf{x}_j) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x})$, siendo este término la distribución marginal de $P(\mathbf{x},y)$ relativa al dominio de las instancias. El objetivo sigue siendo obtener una función $f : \mathcal{X} \to \mathcal{Y}$ tal que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$.
 \end{defi}
 
 \begin{rema}
@@ -38,7 +38,7 @@ Con estas definiciones, queda establecido el problema sobre el que se articula e
 \section{Funciones de pérdida y regularización}
 \label{sec:perdida_regularizacion}
 
-Una vez definido el problema de clasificación semi-supervisada, es necesario introducir los conceptos fundamentales que permiten formalizar el proceso de aprendizaje. En particular, se necesita un mecanismo para medir la calidad de las predicciones de un clasificador y un criterio para seleccionar el mejor clasificador dentro de una familia dada. Las definiciones que se presentan a continuación se basan en las formulaciones de \textit{Introduction to Semi-Supervised Learning, Zhu y Goldberg, 2009} \cite{zhu2009introduction} y \textit{Foundations of Machine Learning, Mohri et al., 2018} \cite{mohri2018foundations}.
+Una vez definido el problema de clasificación semi-supervisada, es necesario introducir los conceptos fundamentales que permiten formalizar el proceso de aprendizaje. En particular, se necesita un mecanismo para medir la calidad de las predicciones de un clasificador y un criterio para seleccionar el mejor clasificador. Las definiciones que se presentan a continuación se basan en las formulaciones de \textit{Introduction to Semi-Supervised Learning, Zhu y Goldberg, 2009} \cite{zhu2009introduction} y \textit{Foundations of Machine Learning, Mohri et al., 2018} \cite{mohri2018foundations}.
 
 \begin{defi}[Función de pérdida]
 \label{def:perdida}
@@ -53,8 +53,8 @@ Una vez establecida la noción de pérdida individual, se puede definir una medi
 
 \begin{defi}[Riesgo]
 \label{def:riesgo}
-Dado un clasificador $f \in \mathcal{F}$\footnote{En esta sección $\mathcal{F}$ denota una familia de funciones arbitraria, más adelante se verá que normalmente en cada problema se considera una familia específica definida por un conjunto de parámetros} y una función de pérdida $c$, el \textbf{riesgo} o \textbf{error de generalización} de $f$ se define como la pérdida esperada bajo la distribución conjunta $P(\mathbf{x}, y)$:
-$$R(f) = \mathbb{E}_{(\mathbf{x},y) \sim P}\left[c(\mathbf{x}, y, f(\mathbf{x}))\right]$$
+Dado un clasificador $\hat{f} \in \mathcal{F} = \{f \mid f: \mathcal{X} \to \mathcal{Y} \}$ y una función de pérdida $c$, el \textbf{riesgo} o \textbf{error de generalización} de $\hat{f}$ se define como la pérdida esperada bajo la distribución conjunta $P(\mathbf{x}, y)$:
+$$R(\hat{f}) = \mathbb{E}_{(\mathbf{x},y) \sim P}\left[c(\mathbf{x}, y, \hat{f}(\mathbf{x}))\right]$$
 El clasificador óptimo es aquel que minimiza el riesgo: $f^* = \arg\min_{f \in \mathcal{F}} R(f)$ \cite{zhu2009introduction}.
 \end{defi}
 
@@ -78,7 +78,7 @@ El principio de \textbf{\gls{ERM}} propone seleccionar el clasificador que minim
     f_{\text{ERM}} = \arg\min_{f \in \mathcal{F}} \hat{R}(f)
 \end{equation}
 
-Sin embargo, este principio tiende a producir modelos que se \textit{sobreajustan} a los datos de entrenamiento, es decir, que memorizan las particularidades del conjunto de entrenamiento perdiendo capacidad de generalización a datos nuevos \cite{mohri2018foundations}. Para mitigar este problema, se introduce un término adicional que penaliza la complejidad del clasificador, dando lugar al marco de \textbf{\gls{RRM}}:
+No obstante, este principio tiende a producir modelos que se \textit{sobreajustan} a los datos de entrenamiento, es decir, que memorizan las particularidades del conjunto de entrenamiento perdiendo capacidad de generalización a datos nuevos \cite{mohri2018foundations}. Para mitigar este problema, se introduce un término adicional que penaliza la complejidad del clasificador, dando lugar al marco de \textbf{\gls{RRM}}:
 
 \begin{defi}[\gls{RRM}]
 \label{def:riesgo_regularizado}
@@ -88,6 +88,12 @@ Dada una función de pérdida $c$, un funcional de regularización $\Omega: \mat
     f^* = \arg\min_{f \in \mathcal{F}} \left[ \hat{R}(f) + \lambda\, \Omega(f) \right] = \arg\min_{f \in \mathcal{F}} \left[ \frac{1}{l}\sum_{i=1}^{l} c(\mathbf{x}_i, y_i, f(\mathbf{x}_i)) + \lambda\, \Omega(f) \right]
 \end{equation}
 \end{defi}
+
+Sin embargo, surge un desafío práctico: la cantidad de posibles clasificadores en el espacio $\mathcal{F}$ puede ser tan vasta que impida realizar esta búsqueda de manera eficiente. Para abordar este problema, los distintos algoritmos de aprendizaje —tanto supervisados como semi-supervisados— restringen el conjunto total de funciones posibles a un subconjunto $\mathcal{H} \subseteq \mathcal{F}$, el cual se denomina formalmente \textbf{espacio de hipótesis}. De este modo, el problema de \gls{RRM} se reformula como:
+\begin{equation}
+\label{eq:riesgo_regularizado_hipotesis}
+    f^* = \arg\min_{f \in \mathcal{H}} \left[ \hat{R}(f) + \lambda\, \Omega(f) \right]
+\end{equation}
 
 Este marco es de gran utilidad tanto para comprender las suposiciones de \gls{SSL} como para formalizar los métodos que se presentarán en capítulos posteriores. En particular, en el contexto semi-supervisado, el funcional de regularización puede incorporar información de los datos no etiquetados, adoptando la forma $\Omega(f) = \Omega_{\text{sup}}(f) + \lambda'\, \Omega_{\text{ssl}}(f)$, donde $\Omega_{\text{sup}}$ es un regularizador estándar y $\Omega_{\text{ssl}}$ es un término que codifica información sobre la estructura de $P(\mathbf{x})$, estimada a partir de los datos no etiquetados \cite{zhu2009introduction}.
 
