@@ -1,19 +1,19 @@
 \chapter{Introducción al Aprendizaje Semi-Supervisado}
 
-En este capítulo se da un enfoque formal a los conceptos introducidos en el capítulo anterior. En la sección \ref{sec:problema_clasificacion} se presenta una definición formal de la clasificación semi-supervisada, el concepto sobre el que se articula el trabajo. Posteriormente, en la sección \ref{sec:suposiciones}, se presentan las suposiciones que hay detrás del aprendizaje semi-supervisado, y que son necesarias para entender cómo este puede obtener mejor rendimiento que el aprendizaje supervisado, y cuándo es así.
+En este capítulo se da un enfoque formal a los conceptos introducidos en el capítulo anterior. En la sección \ref{sec:problema_clasificacion} se presenta una definición formal de la clasificación semi-supervisada, el concepto sobre el que se articula el trabajo. Posteriormente, en la sección \ref{sec:suposiciones}, se presentan las suposiciones que hay detrás de \gls{SSL}, y que son necesarias para entender cómo este puede obtener mejor rendimiento que \gls{SL}, y cuándo es así.
 
 \section{Problema de clasificación semi-supervisado}
 \label{sec:problema_clasificacion}
 
-Una vez introducida la idea en la que se basa el aprendizaje semi-supervisado, y dado que este trabajo se va a centrar en su aplicación a problemas de clasificación, es necesario definir de manera formal este problema. Para ello, vamos a hacer uso de una serie de definiciones que se encuentran en el libro de  \textit{Introduction to Semi-Supervised Learning, Xiaojin Zhu y Goldberg, 2009} \cite{zhu2009introduction}, y que se presentan a continuación.
+Una vez introducida la idea en la que se basa el \gls{SSL}, y dado que este trabajo se va a centrar en su aplicación a problemas de clasificación, es necesario definir de manera formal este problema. Para ello, vamos a hacer uso de una serie de definiciones que se encuentran en el libro de  \textit{Introduction to Semi-Supervised Learning, Xiaojin Zhu y Goldberg, 2009} \cite{zhu2009introduction}, y que se presentan a continuación.
 
-Como primer paso se presenta la definición del aprendizaje supervisado, que, como se ha mencionado, es la base del aprendizaje semi-supervisado:
+Como primer paso se presenta la definición de \gls{SL}, que, como se ha mencionado, es la base de \gls{SSL}:
 
-\begin{defi}[Aprendizaje Supervisado]
-Sea $\mathcal{X}$ el dominio de las instancias, e $\mathcal{Y}$ el dominio de las etiquetas. Sea $P(\mathbf{x},y)$ una distribución de probabilidad conjunta (desconocida) sobre las instancias y etiquetas $\mathcal{X} \times \mathcal{Y}$. Dado un conjunto de entrenamiento $\{(\mathbf{x}_i, y_i)\}_{i=1}^n$ con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ (independiente e idénticamente distribuido), el aprendizaje supervisado entrena, usando este conjunto, una función $f : \mathcal{X} \to \mathcal{Y}$\footnote{A lo largo de este trabajo, los términos modelo y algoritmo se utilizarán de manera intercambiable. No obstante, en sentido estricto, el modelo hace referencia a la función matemática (o hipótesis) que evalúa un vector de entrada para predecir una etiqueta, mientras que el algoritmo (de aprendizaje) es el procedimiento de optimización empleado para ajustar los parámetros de dicha función a partir del conjunto de entrenamiento.} en alguna familia de funciones $\mathcal{F}$, con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ también.
+\begin{defi}[\gls{SL}]
+Sea $\mathcal{X}$ el dominio de las instancias, e $\mathcal{Y}$ el dominio de las etiquetas. Sea $P(\mathbf{x},y)$ una distribución de probabilidad conjunta (desconocida) sobre las instancias y etiquetas $\mathcal{X} \times \mathcal{Y}$. Dado un conjunto de entrenamiento $\{(\mathbf{x}_i, y_i)\}_{i=1}^n$ con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ (independiente e idénticamente distribuido), \gls{SL} entrena, usando este conjunto, una función $f : \mathcal{X} \to \mathcal{Y}$\footnote{A lo largo de este trabajo, los términos modelo y algoritmo se utilizarán de manera intercambiable. No obstante, en sentido estricto, el modelo hace referencia a la función matemática (o hipótesis) que evalúa un vector de entrada para predecir una etiqueta, mientras que el algoritmo (de aprendizaje) es el procedimiento de optimización empleado para ajustar los parámetros de dicha función a partir del conjunto de entrenamiento.} en alguna familia de funciones $\mathcal{F}$, con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$ también.
 \end{defi}
 
-A partir de esta definición de aprendizaje supervisado, se puede entonces definir el problema de clasificación:
+A partir de esta definición de \gls{SL}, se puede entonces definir el problema de clasificación:
 
 \begin{defi}[Clasificación]
 La clasificación es el problema de aprendizaje supervisado con clases discretas $\mathcal{Y}$. La función $f$ se denomina clasificador.
@@ -22,7 +22,7 @@ La clasificación es el problema de aprendizaje supervisado con clases discretas
 Finalmente, podemos definir el problema de clasificación semi-supervisado como una extensión del supervisado de la siguiente manera:
 
 \begin{defi}[Clasificación Semi-Supervisada]
-Bajo las condiciones del aprendizaje supervisado, se expande el conjunto de entrenamiento para que consista tanto en $l$ instancias etiquetadas $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$, con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$,  como en $u$ instancias no etiquetadas $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$, con $(\mathbf{x}_j) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x})$, siendo este término la distribución marginal de $P(\mathbf{x},y)$ relativa al dominio de las instancias. El objetivo sigue siendo entrenar una función $f : \mathcal{X} \to \mathcal{Y}$ en alguna familia de funciones $\mathcal{F}$, con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$.
+Bajo las condiciones de \gls{SL}, se expande el conjunto de entrenamiento para que consista tanto en $l$ instancias etiquetadas $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$, con $(\mathbf{x}_i, y_i) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$,  como en $u$ instancias no etiquetadas $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$, con $(\mathbf{x}_j) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x})$, siendo este término la distribución marginal de $P(\mathbf{x},y)$ relativa al dominio de las instancias. El objetivo sigue siendo entrenar una función $f : \mathcal{X} \to \mathcal{Y}$ en alguna familia de funciones $\mathcal{F}$, con el objetivo de que $f(\mathbf{x})$ prediga la verdadera etiqueta $y$ en datos futuros $\mathbf{x}$, donde $(\mathbf{x},y) \overset{\text{i.i.d.}}{\sim} P(\mathbf{x},y)$.
 \end{defi}
 
 \begin{rema}
@@ -33,7 +33,7 @@ Se asume típicamente que hay muchos más datos no etiquetados que etiquetados, 
 Al tratarse del problema de clasificación, el dominio de las etiquetas $\mathcal{Y}$ es un conjunto discreto. Si fuera continuo, estaríamos hablando de un problema de regresión semi-supervisada que queda fuera del alcance de este trabajo.
 \end{rema}
 
-Con estas definiciones, queda establecido el problema sobre el que se articula este trabajo. En la siguiente sección se introducen los conceptos de función de pérdida y regularización, herramientas fundamentales para formalizar el proceso de aprendizaje. Posteriormente, en la sección \ref{sec:suposiciones}, se explicará por qué y bajo qué condiciones el aprendizaje semi-supervisado puede superar al aprendizaje supervisado.
+Con estas definiciones, queda establecido el problema sobre el que se articula este trabajo. En la siguiente sección se introducen los conceptos de función de pérdida y regularización, herramientas fundamentales para formalizar el proceso de aprendizaje. Posteriormente, en la sección \ref{sec:suposiciones}, se explicará por qué y bajo qué condiciones \gls{SSL} puede superar a \gls{SL}.
 
 \section{Funciones de pérdida y regularización}
 \label{sec:perdida_regularizacion}
@@ -72,34 +72,34 @@ $$\hat{R}(f) = \frac{1}{l}\sum_{i=1}^{l} c(\mathbf{x}_i, y_i, f(\mathbf{x}_i))$$
 El riesgo empírico es un estimador insesgado del riesgo real, es decir, $\mathbb{E}[\hat{R}(f)] = R(f)$ \cite{mohri2018foundations}. Esto justifica su uso como aproximación del riesgo verdadero.
 \end{rema}
 
-El principio de \textbf{minimización del riesgo empírico} (ERM, por sus siglas en inglés) propone seleccionar el clasificador que minimice esta cantidad:
+El principio de \textbf{\gls{ERM}} propone seleccionar el clasificador que minimice esta cantidad:
 \begin{equation}
 \label{eq:erm}
     f_{\text{ERM}} = \arg\min_{f \in \mathcal{F}} \hat{R}(f)
 \end{equation}
 
-Sin embargo, este principio tiende a producir modelos que se \textit{sobreajustan} a los datos de entrenamiento, es decir, que memorizan las particularidades del conjunto de entrenamiento perdiendo capacidad de generalización a datos nuevos \cite{mohri2018foundations}. Para mitigar este problema, se introduce un término adicional que penaliza la complejidad del clasificador, dando lugar al marco de \textbf{minimización del riesgo regularizado}:
+Sin embargo, este principio tiende a producir modelos que se \textit{sobreajustan} a los datos de entrenamiento, es decir, que memorizan las particularidades del conjunto de entrenamiento perdiendo capacidad de generalización a datos nuevos \cite{mohri2018foundations}. Para mitigar este problema, se introduce un término adicional que penaliza la complejidad del clasificador, dando lugar al marco de \textbf{\gls{RRM}}:
 
-\begin{defi}[Minimización del riesgo regularizado]
+\begin{defi}[\gls{RRM}]
 \label{def:riesgo_regularizado}
-Dada una función de pérdida $c$, un funcional de regularización $\Omega: \mathcal{F} \to \mathbb{R}_{\geq 0}$ que mide la complejidad del modelo, y un parámetro de regularización $\lambda > 0$, el problema de minimización del riesgo regularizado consiste en encontrar:
+Dada una función de pérdida $c$, un funcional de regularización $\Omega: \mathcal{F} \to \mathbb{R}_{\geq 0}$ que mide la complejidad del modelo, y un parámetro de regularización $\lambda > 0$, el problema de \gls{RRM} consiste en encontrar:
 \begin{equation}
 \label{eq:riesgo_regularizado}
     f^* = \arg\min_{f \in \mathcal{F}} \left[ \hat{R}(f) + \lambda\, \Omega(f) \right] = \arg\min_{f \in \mathcal{F}} \left[ \frac{1}{l}\sum_{i=1}^{l} c(\mathbf{x}_i, y_i, f(\mathbf{x}_i)) + \lambda\, \Omega(f) \right]
 \end{equation}
 \end{defi}
 
-Este marco es de gran utilidad tanto para comprender las suposiciones del aprendizaje semi-supervisado como para formalizar los métodos que se presentarán en capítulos posteriores. En particular, en el contexto semi-supervisado, el funcional de regularización puede incorporar información de los datos no etiquetados, adoptando la forma $\Omega(f) = \Omega_{\text{sup}}(f) + \lambda'\, \Omega_{\text{ssl}}(f)$, donde $\Omega_{\text{sup}}$ es un regularizador estándar y $\Omega_{\text{ssl}}$ es un término que codifica información sobre la estructura de $P(\mathbf{x})$, estimada a partir de los datos no etiquetados \cite{zhu2009introduction}.
+Este marco es de gran utilidad tanto para comprender las suposiciones de \gls{SSL} como para formalizar los métodos que se presentarán en capítulos posteriores. En particular, en el contexto semi-supervisado, el funcional de regularización puede incorporar información de los datos no etiquetados, adoptando la forma $\Omega(f) = \Omega_{\text{sup}}(f) + \lambda'\, \Omega_{\text{ssl}}(f)$, donde $\Omega_{\text{sup}}$ es un regularizador estándar y $\Omega_{\text{ssl}}$ es un término que codifica información sobre la estructura de $P(\mathbf{x})$, estimada a partir de los datos no etiquetados \cite{zhu2009introduction}.
 
 \section{Suposiciones del aprendizaje semi-supervisado}
 \label{sec:suposiciones}
 
-Aunque no todos los métodos de aprendizaje semi-supervisado se basan explícitamente en probabilidades, resulta útil para entender cómo el aprendizaje semi-supervisado puede obtener mejor rendimiento que el aprendizaje supervisado, asumir que los métodos representan las hipótesis como $p(y \mid \mathbf{x})$ y los datos no etiquetados como $p(\mathbf{x})$. La clave para entender el papel de los datos no etiquetados reside en la descomposición de la distribución conjunta:
+Aunque no todos los métodos de \gls{SSL} se basan explícitamente en probabilidades, resulta útil para entender cómo \gls{SSL} puede obtener mejor rendimiento que \gls{SL}, asumir que los métodos representan las hipótesis como $p(y \mid \mathbf{x})$ y los datos no etiquetados como $p(\mathbf{x})$. La clave para entender el papel de los datos no etiquetados reside en la descomposición de la distribución conjunta:
 $$p(\mathbf{x}, y) = p(y \mid \mathbf{x})\, p(\mathbf{x})$$
 
-En el aprendizaje supervisado, el objetivo es estimar $p(y \mid \mathbf{x})$, y la distribución marginal $p(\mathbf{x})$ no aporta información adicional directa sobre $p(y \mid \mathbf{x})$. Sin embargo, en el aprendizaje semi-supervisado, la información que proporcionan los datos no etiquetados sobre $p(\mathbf{x})$ se puede aprovechar de dos posibles formas: o bien a través de modelos generativos que estiman la distribución conjunta $p(\mathbf{x},y)$, la cual comparte parámetros con $p(\mathbf{x})$; o bien modificando la función objetivo (por ejemplo, el funcional de regularización $\Omega_{\text{ssl}}$ de la Sección \ref{sec:perdida_regularizacion}) para incorporar términos que dependan de $p(\mathbf{x})$ \cite{zhu2005semi}.
+En \gls{SL}, el objetivo es estimar $p(y \mid \mathbf{x})$, y la distribución marginal $p(\mathbf{x})$ no aporta información adicional directa sobre $p(y \mid \mathbf{x})$. Sin embargo, en \gls{SSL}, la información que proporcionan los datos no etiquetados sobre $p(\mathbf{x})$ se puede aprovechar de dos posibles formas: o bien a través de modelos generativos que estiman la distribución conjunta $p(\mathbf{x},y)$, la cual comparte parámetros con $p(\mathbf{x})$; o bien modificando la función objetivo (por ejemplo, el funcional de regularización $\Omega_{\text{ssl}}$ de la Sección \ref{sec:perdida_regularizacion}) para incorporar términos que dependan de $p(\mathbf{x})$ \cite{zhu2005semi}.
 
-No obstante, para que el conocimiento sobre $p(\mathbf{x})$ sea realmente útil para inferir $p(y \mid \mathbf{x})$, debe existir una relación estructural entre ambas distribuciones. Es por esto que detrás de cada método de aprendizaje semi-supervisado hay una serie de suposiciones sobre cómo estas distribuciones se relacionan entre sí. Pero, antes de exponer estas suposiciones, conviene clarificar algunos conceptos fundamentales sobre la geometría de los datos:
+No obstante, para que el conocimiento sobre $p(\mathbf{x})$ sea realmente útil para inferir $p(y \mid \mathbf{x})$, debe existir una relación estructural entre ambas distribuciones. Es por esto que detrás de cada método de \gls{SSL} hay una serie de suposiciones sobre cómo estas distribuciones se relacionan entre sí. Pero, antes de exponer estas suposiciones, conviene clarificar algunos conceptos fundamentales sobre la geometría de los datos:
 
 \begin{itemize}
 \item \textbf{Densidad:} Se refiere a la concentración de puntos en una región determinada del dominio de las instancias $\mathcal{X}$. Formalmente, las regiones de alta densidad son aquellas donde el valor de la función de densidad de probabilidad $p(\mathbf{x})$ es elevado, mientras que las de baja densidad corresponden a valores reducidos de $p(\mathbf{x})$.
@@ -124,4 +124,4 @@ Una vez presentados estos conceptos, se pueden entonces exponer cuáles son las 
 Las suposiciones de clústers y de baja densidad, aunque equivalentes desde un punto de vista teórico, sugieren diferentes estrategias algorítmicas. La suposición de clústers lleva naturalmente a métodos que primero identifican la estructura de los datos (como los basados en grafos), mientras que la suposición de baja densidad sugiere métodos que buscan directamente fronteras de decisión en regiones de baja densidad (como los métodos de máximo margen).
 \end{rema}
 
-Destacar que si la suposición en la que se basa un método de aprendizaje semi-supervisado no se cumple, el uso de datos no etiquetados puede ser contraproducente y empeorar el rendimiento respecto al aprendizaje supervisado \cite{zhu2009introduction}. Este fenómeno de degradación del rendimiento, subraya la importancia de verificar o al menos controlar la validez de las suposiciones a la hora de aplicar un método semi-supervisado a un problema concreto.
+Destacar que si la suposición en la que se basa un método de \gls{SSL} no se cumple, el uso de datos no etiquetados puede ser contraproducente y empeorar el rendimiento respecto a \gls{SL} \cite{zhu2009introduction}. Este fenómeno de degradación del rendimiento, subraya la importancia de verificar o al menos controlar la validez de las suposiciones a la hora de aplicar un método semi-supervisado a un problema concreto.

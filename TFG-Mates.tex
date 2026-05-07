@@ -12,6 +12,11 @@
 % Paquete que contiene las definiciones de la plantilla
 \usepackage{tfg-estilo}
 
+% Paquete para acrónimos
+\usepackage[acronym]{glossaries}
+\input{acronimos.tex}
+\makenoidxglossaries
+
 {\theorembodyfont{\itshape}
 \newtheorem{theo}{Teorema}[chapter]
 \newtheorem{prop}[theo]{Proposición}
@@ -59,6 +64,8 @@
 \input{capitulo7.tex}
 
 \backmatter
+
+\printnoidxglossary[type=\acronymtype,title=Acrónimos]
 
 \bibliographystyle{plain}
 \bibliography{bibliografia}

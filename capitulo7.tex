@@ -6,7 +6,7 @@ El enfoque transductivo aparece de manera natural en los métodos semi-supervisa
 
 Esta idea es conceptualmente cercana a la de los métodos basados en variedades (véase la Sección \ref{sec:variedades}), donde el grafo se utiliza como una aproximación discreta de la geometría de los datos. La diferencia clave es que, en el planteamiento transductivo, la función de decisión se define \emph{directamente sobre los nodos} del grafo, de modo que el problema se reduce a propagar de forma coherente la información de las etiquetas conocidas hacia los nodos no etiquetados \cite{van2020survey}.
 
-Usando el marco de pérdida y regularización introducido en la Sección \ref{sec:perdida_regularizacion}, el aprendizaje transductivo sobre grafos puede formularse como la minimización de un término de ajuste en los nodos etiquetados más un término que penaliza la falta de suavidad sobre el grafo \cite{van2020survey,zhu2005semi}.
+Usando el marco de \gls{RRM} introducido en la Sección \ref{sec:perdida_regularizacion}, el aprendizaje transductivo sobre grafos puede formularse como la minimización de un término de ajuste en los nodos etiquetados más un término que penaliza la falta de suavidad sobre el grafo \cite{van2020survey,zhu2005semi}.
 
 \begin{equation}
     \label{eq:minimizacionGrafos}
