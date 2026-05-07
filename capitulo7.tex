@@ -69,9 +69,9 @@ Una vez fijado el grafo, muchos métodos de inferencia pueden interpretarse como
 
 \subsection{Mincut}
 
-El método \textit{mincut} (o \textit{s-t mincut}) se plantea típicamente para clasificación binaria y busca un corte del grafo que separe los nodos etiquetados positivos de los negativos minimizando la suma de pesos de las aristas cortadas \cite{zhu2009introduction}. Una vez fijado el corte, los nodos no etiquetados heredan la etiqueta del lado del corte al que quedan conectados.
+El método \textit{mincut} se plantea típicamente para clasificación binaria y busca un corte del grafo que separe los nodos etiquetados positivos de los negativos minimizando la suma de pesos de las aristas cortadas \cite{zhu2009introduction}. Una vez fijado el corte, los nodos no etiquetados heredan la etiqueta del lado del corte al que quedan conectados.
 
-Atendiendo a la formulación de la Ecuación \ref{eq:minimizacionGrafos}, este método puede verse como la elección de una pérdida supervisada con peso infinito (equivalentemente, imponiendo como restricciones las etiquetas en $L$) junto con un término de suavidad cuadrático en el grafo. Una formulación habitual es
+Atendiendo a la formulación de la Ecuación \ref{eq:minimizacionGrafos}, este método puede verse como la elección de una pérdida supervisada con peso infinito (equivalentem a imponer como restricciones las etiquetas en $L$) junto con un término de suavidad cuadrático en el grafo. Una posible formulación es:
 
 \begin{equation}
     \min_{f: f(\mathbf{x}_i)\in\{-1,1\}} \; \frac{1}{4} \sum_{i,j} w_{ij}\, \bigl(f(\mathbf{x}_i) - f(\mathbf{x}_j)\bigr)^2
@@ -84,9 +84,13 @@ El enfoque tiene limitaciones conocidas: en su forma básica está restringido a
 
 La idea de este método es relajar el problema de \textit{mincut} permitiendo que, en los nodos no etiquetados, la función $f$ tome valores continuos (por ejemplo, puntuaciones en $\mathbb{R}$), manteniendo las etiquetas conocidas fijadas en $L$. Gracias a esta relajación, el problema se reduce a la minimización de una función cuadrática, lo que conduce a una solución cerrada\footnote{Es decir, tiene una forma explícita que se calcula resolviendo un sistema de ecuaciones lineales} que, bajo condiciones suaves, es única y óptima \cite{zhu2009introduction}.
 
-El nombre proviene de la conexión con las funciones armónicas: la solución satisface una condición de \emph{media ponderada} sobre el grafo. En particular, para cada nodo no etiquetado $i\in U$ se cumple \cite{van2020survey}:
+El nombre proviene de la conexión con las funciones armónicas, puesto que la solución satisface una condición de \emph{media ponderada} sobre el grafo. En particular, para cada nodo no etiquetado $i\in U$ se cumple \cite{van2020survey}:
 \begin{equation}
     \sum_{j \in N(i)} w_{ij} (f(\mathbf{x}_i) - f(\mathbf{x}_j)) = 0
 \end{equation}
 
-equivalentemente, $f(\mathbf{x}_i)$ coincide con el promedio ponderado de sus vecinos, con pesos proporcionales a $w_{ij}$.
+lo que es equivalente a que $f(\mathbf{x}_i)$ coincida con el promedio ponderado de sus vecinos, con pesos proporcionales a $w_{ij}$.
+
+\subsection{limitaciones y uso práctico}
+
+Los métodos anteriores son ejemplos clásicos de inferencia transductiva sobre grafos, pero existen muchas otras variantes y extensiones que se han propuesto en la literatura \cite{van2020survey}. En la práctica, estos enfoques resultan especialmente útiles cuando la estructura original del problema permite una representación inherente en forma de grafo, habitual en problemas de redes. Sin embargo, al igual que ocurría en los métodos basados en variedades en la Sección \ref{sec:variedades}, presentan limitaciones importantes, tanto por su sensibilidad a la construcción del grafo como por su elevado coste computacional, que puede crecer rápidamente con el número de instancias \cite{van2020survey}.
