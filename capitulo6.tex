@@ -191,18 +191,22 @@ Estos métodos se apoyan en la hipótesis de la variedad: se asume que los datos
 
 \subsection{Técnicas de regularización de la variedad}
 
-Una forma habitual de aproximar la variedad subyacente es construir un grafo de similitud entre instancias \cite{van2020survey}. Dado un conjunto de entrenamiento formado por $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$ instancias etiquetadas y $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ instancias sin etiquetar, se construye un grafo no dirigido $G=(V,E)$ donde cada nodo corresponde a una instancia (etiquetada o no)\footnote{Como consecuencia, los grafos resultantes suelen tener gran tamaño cuando se dispone de una gran cantidad de instancias no etiquetadas \cite{zhu2009introduction}.}, y a cada arista $(i,j)\in E$ se le asigna un peso $w_{ij}$ que refleja la similitud entre $\mathbf{x}_i$ y $\mathbf{x}_j$. Denotamos por $W=(w_{ij})$ la matriz de pesos. La intuición es que, si $w_{ij}$ es alto, entonces es más probable que ambas instancias compartan etiqueta \cite{zhu2009introduction}.
+Una forma habitual de aproximar la variedad subyacente es construir un grafo de similitud entre instancias \cite{van2020survey}. Dado un conjunto de entrenamiento formado por $\{(\mathbf{x}_i, y_i)\}_{i=1}^l$ instancias etiquetadas y $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ instancias sin etiquetar, se construye un grafo no dirigido $G=(V,E)$ donde cada nodo corresponde a una instancia (etiquetada o no)\footnote{Como consecuencia, los grafos resultantes suelen tener gran tamaño cuando se dispone de una gran cantidad de instancias no etiquetadas \cite{zhu2009introduction}.}, y a cada arista $(i,j)\in E$ se le asigna un peso $w_{ij}$ que refleja la similitud entre $\mathbf{x}_i$ y $\mathbf{x}_j$.
 
-Hay varias formas de definir la vecindad y/o la similitud. Por ejemplo, puede construirse un grafo de $k$ vecinos más cercanos y asignar pesos gaussianos $w_{ij} = \exp\bigl(-\frac{\|\mathbf{x}_i - \mathbf{x}_j\|^2}{2\sigma^2}\bigr)$ a las aristas \cite{zhu2009introduction}.
+Usualmente se denota por $W=(w_{ij})$ a la matriz de pesos, y la intuición es que, si $w_{ij}$ es alto, entonces es más probable que ambas instancias compartan etiqueta \cite{zhu2009introduction}. Hay varias formas de definir la vecindad y/o la similitud entre nodos, que se verán con mayor profundidad en el siguiente capítulo.
 
 Una vez construido el grafo, se busca una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ que no solo clasifique correctamente los ejemplos etiquetados, sino que también sea suave respecto a la estructura del grafo; es decir, que produzca salidas similares en nodos conectados por aristas con pesos altos \cite{zhu2009introduction}.
 
-Para ello, un enfoque representativo es el presentado en \textit{On Manifold Regularization, Belkin et al., 2005} \cite{belkin2005manifold}. Partiendo de un marco de aprendizaje supervisado, se considera un kernel $K$\footnote{Un kernel es una función $K:\mathcal{X}\times\mathcal{X}\to\mathbb{R}$ que puede interpretarse como un producto escalar en un espacio de características (posiblemente de mayor dimensión) \cite{bishop2006pattern}.}, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
+Para ello, un enfoque representativo es el presentado en \textit{On Manifold Regularization, Belkin et al., 2005} \cite{belkin2005manifold}. Partiendo de un marco de aprendizaje supervisado, se considera un kernel $K$, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Y se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
+
 \begin{equation}
     \mathcal{L}(f) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i)) + \lambda \|f\|_K^2,
 \end{equation}
-
 donde el primer término es la pérdida de clasificación sobre los datos etiquetados y el segundo término es un regularizador que penaliza la complejidad de la función $f$ \cite{belkin2005manifold}.
+
+\begin{rema}
+   Con un kernel, nos referimos a una función $K:\mathcal{X}\times\mathcal{X}\to\mathbb{R}$ que se suele interpretar como un producto escalar en un espacio ambiente de mayor dimensión \cite{bishop2006pattern}.
+\end{rema}
 
 Finalmente, la información no etiquetada se introduce mediante un término de regularización adicional, utilizando la matriz de pesos $W$, que penaliza la falta de suavidad de $f$ respecto a la estructura del grafo:
 \begin{equation}

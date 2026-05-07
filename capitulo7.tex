@@ -38,22 +38,22 @@ El primer paso de la construcción de un grafo de similitud es definir una matri
 
 \subsection{Asignación de pesos}
 
-Una vez definida la estructura del grafo, el siguiente paso es asignar pesos a las aristas. Estos pesos reflejan la similitud entre los nodos conectados, y su elección puede afectar significativamente el rendimiento del método de inferencia \cite{van2020survey}. Algunas formas comunes de asignar pesos son:
+Una vez definida la estructura del grafo, el siguiente paso es asignar pesos a las aristas. Estos pesos reflejan la similitud entre los nodos conectados, y su elección puede afectar significativamente el rendimiento del método de inferencia \cite{van2020survey}. Algunas formas de asignar pesos son:
 
 \begin{itemize}
-    \item \textbf{Asignación gaussiana}: Una forma común de asignar pesos es usar una función gaussiana de la distancia entre los nodos, es decir, 
+    \item \textbf{Asignación gaussiana}: Una de las formas más comunes, consiste en usar una función gaussiana junto con la distancia entre los nodos, es decir, 
     \begin{equation}
         w_{ij} = \exp(-\frac{\|\mathbf{x}_i - \mathbf{x}_j\|^2}{2\sigma^2})
     \end{equation}
     donde $\sigma$ es un parámetro que controla la velocidad de decaimiento de la similitud \cite{zhu2009introduction}. Este método es popular porque produce pesos que decaen suavemente con la distancia, pero requiere elegir el parámetro $\sigma$ de manera adecuada.
 
-    \item \textbf{Asignación gaussiana modificada}: Una variante de la anterior es usar una función gaussiana modificada que tenga en cuenta la densidad local de los datos, es decir,
+    \item \textbf{Asignación gaussiana modificada}: Una variante de la anterior, en la que se modifica la función gaussiana para tener en cuenta la densidad local de los datos, es decir,
     \begin{equation}
         w_{ij} = \exp(-\frac{\|\mathbf{x}_i - \mathbf{x}_j\|^2}{\max\{\sigma_i, \sigma_j\}^2})
     \end{equation}
     donde $\sigma_i$ y $\sigma_j$ son las distancias a los vecinos más cercanos de los nodos $i$ y $j$, respectivamente \cite{hein2006manifold}. 
 
-    \item \textbf{Propagación lineal de vecinos}: Los métodos anteriores asignan $w_{ij}$ a partir de una función explícita de la distancia entre dos nodos. Sin embargo, existen alternativas que incorporan información de todo el vecindario. Un ejemplo es asignar pesos imponiendo que cada instancia pueda aproximarse como una combinación lineal de sus vecinos, minimizando un error de reconstrucción \cite{van2020survey}:
+    \item \textbf{Propagación lineal de vecinos}: A diferencia de los métodos anteriores que asignan $w_{ij}$ a partir de una función explícita de la distancia entre dos nodos. Existen alternativas que incorporan información de todo el vecindario. Un ejemplo es asignar pesos imponiendo que cada instancia pueda aproximarse como una combinación lineal de sus vecinos, minimizando un error de reconstrucción \cite{van2020survey}:
     \begin{equation}
         \min_{\{w_{ij}\}} \sum_{i} \left\| \mathbf{x}_i - \sum_{j \in N(i)} w_{ij} \, \mathbf{x}_j \right\|^2
     \end{equation}

@@ -21,19 +21,21 @@ A pesar de su simplicidad, se pueden realizar varias decisiones de diseño a la 
 
 Se expone a continuación un algoritmo de \gls{ST} donde se pueden observar estas decisiones de diseño:
 
-\begin{algo}
-    \textbf{Auto-entrenamiento}
-    \\Entrada: Conjunto de datos etiquetados $L = \{(\mathbf{x}_i, y_i)\}_{i=1}^l$, conjunto de datos no etiquetados $U = \{\mathbf{x}_j\}_{j=l+1}^{l+u}$, clasificador supervisado $f$, criterio de selección de predicciones de mayor confianza $C$, criterio de parada $S$.
-    \\Salida: Clasificador entrenado $f$.
-    \\Procedimiento:
-    \\Mientras no se cumpla el criterio de parada $S$:
-    \begin{enumerate}
-        \item Entrenar el clasificador supervisado $f$ con los datos etiquetados $L$.
-        \item Predecir etiquetas para los datos no etiquetados $U$ utilizando el clasificador supervisado $f$, obteniendo un conjunto de predicciones $P$.
-        \item Seleccionar un subconjunto de predicciones $P_{conf}$ de $P$ utilizando el criterio de selección de predicciones de mayor confianza $C$.
-        \item Añadir las predicciones seleccionadas $P_{conf}$ al conjunto de datos etiquetados $L$, convirtiéndolas en datos pseudoetiquetados.
-        \item Eliminar las predicciones seleccionadas $P_{conf}$ del conjunto de datos no etiquetados $U$.
-    \end{enumerate}
+\begin{algo}[Autoentrenamiento]
+    \mbox{}
+    \begin{itemize}
+    \item Entrada: Conjunto de datos etiquetados $L = \{(\mathbf{x}_i, y_i)\}_{i=1}^l$, conjunto de datos no etiquetados $U = \{\mathbf{x}_j\}_{j=l+1}^{l+u}$, clasificador supervisado $f$, criterio de selección de predicciones de mayor confianza $C$, criterio de parada $S$.
+    \item Salida: Clasificador entrenado $f$.
+    \item Procedimiento:
+        \\Mientras no se cumpla el criterio de parada $S$:
+        \begin{enumerate}
+            \item Entrenar el clasificador supervisado $f$ con los datos etiquetados $L$.
+            \item Predecir etiquetas para los datos no etiquetados $U$ utilizando el clasificador supervisado $f$, obteniendo un conjunto de predicciones $P$.
+            \item Seleccionar un subconjunto de predicciones $P_{conf}$ de $P$ utilizando el criterio de selección de predicciones de mayor confianza $C$.
+            \item Añadir las predicciones seleccionadas $P_{conf}$ al conjunto de datos etiquetados $L$, convirtiéndolas en datos pseudoetiquetados.
+            \item Eliminar las predicciones seleccionadas $P_{conf}$ del conjunto de datos no etiquetados $U$.
+        \end{enumerate}
+    \end{itemize}
 \end{algo}
 
 \section{Métodos basados en desacuerdo}
