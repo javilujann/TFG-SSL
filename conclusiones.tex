@@ -1,0 +1,50 @@
+\chapter{Conclusiones}
+
+El \gls{SSL} es una rama muy interesante del \gls{ML} al permitir reducir la necesidad de disponer de grandes cantidades de datos etiquetados y compensar esta carencia mediante el uso de datos no etiquetados. Sin embargo, como se ha visto a lo largo de este trabajo, esta ventaja es posible únicamente gracias a la introducción de fuertes suposiciones matemáticas sobre la distribución de los datos, las cuales permiten fundamentar los diferentes métodos de \gls{SSL}.
+
+A través de este trabajo, se puede dejar de ver estos algoritmos como simples cajas negras para pasar a entender el funcionamiento interno de cada uno de ellos. Lo que permite plantear con mayor claridad en qué escenarios es más adecuado utilizar cada enfoque.
+
+Primero, se debe tener claro el objetivo final que se persigue. Si encontrar un modelo con la intención de generalizar a nuevos datos, o simplemente encontrar una asignación de etiquetas para los datos de entrenamiento. En el primer caso, es necesario recurrir a un método de \gls{SSL} inductivo, mientras que en el segundo caso se puede emplear un método transductivo. Además, tambien hay que tener en cuenta también qué es lo que se está buscando: si dar un mayor impulso a un método de \gls{SL} tradicional, o si se quiere aplicar un método de \gls{SSL} puro.
+
+Si se busca mejorar el rendimiento de un método de \gls{SL} tradicional, encontramos dos grandes familias inductivas. Por un lado, los métodos envolventes, que ofrecen alternativas para que uno o varios modelos se retroalimenten, aunque conllevan el riesgo de generar una retroalimentación negativa. Por otro lado, los métodos de preprocesado no supervisado, que para utilizarlos correctamente es necesario tener un buen conocimiento de los datos (en caso de que se busque hacer clustering), de los modelos (en caso de que se busque preentrenar un modelo), o de ambos en el caso de la extracción de características, pues hay que entender cómo se transforman los datos y cómo estos cambios pueden afectar al modelo de \gls{SL}.
+
+Finalmente, en el caso de los métodos de \gls{SSL} puro, donde encontramos familias tanto inductivas como transductivas, se cabe esperar los mejores resultados, pero hay una mayor dependencia de las suposiciones matemáticas. Un método generativo de mezcla de modelos funcionará exclusivamente si las suposiciones sobre las distribuciones probabilísticas de los datos (clústeres) se cumplen; las funciones de decisión en métodos de máximo margen, aunque flexibles por el uso de variables de holgura, no serán capaces de adaptarse a problemas que sean altamente no separables (baja densidad); y los métodos basados en grafos fallarán si no existe una variedad topológica subyacente que representar.
+
+En definitiva, el \gls{SSL} ha demostrado de manera empírica ser una herramienta muy potente, pero también muy delicada por su dependencia de suposiciones matemáticas. Para facilitar la correcta selección de algoritmos, se presenta la Tabla \ref{tab:matriz_decision_ssl}, que resume los fundamentos de las distintas familias y expone situaciones prácticas en las que cada una de ellas puede resultar más adecuada.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Tabla práctica para la Selección de Algoritmos de \gls{SSL}}
+\label{tab:matriz_decision_ssl}
+\renewcommand{\arraystretch}{1.3} 
+\begin{tabular}{
+  >{\raggedright\arraybackslash}p{3cm} 
+  >{\raggedright\arraybackslash}p{4cm} 
+  >{\raggedright\arraybackslash}p{4cm} 
+  >{\raggedright\arraybackslash}p{4cm}
+}
+\toprule
+\textbf{Familia de Algoritmos SSL} & \textbf{Suposición Matemática Fundamental} & \textbf{Escenario Práctico de Aplicación} & \textbf{Limitaciones y Complejidad Computacional} \\
+\midrule
+
+Métodos Generativos & Los datos provienen de un modelo de mezcla paramétrico que aproxima la distribución $P(x,y)$ & Tareas donde se tiene conocimiento previo experto sobre la distribución probabilística base (ej. genética). & Alta vulnerabilidad a la mala especificación del modelo; si el modelo paramétrico es incorrecto, el rendimiento decae drásticamente. \\ 
+\addlinespace
+
+Métodos Discriminativos (S3VM) & Fronteras de decisión en regiones de baja densidad y maximización del margen geométrico & Problemas de clasificación binaria con fronteras teóricas claras, como la categorización de textos o el análisis de sentimiento. & La función objetivo pierde su concavidad. La optimización es propensa a caer en mínimos locales y presenta dificultad para escalar. \\ 
+\addlinespace
+
+Regularización de Variedades & Los datos residen en subespacios difeomorfos de menor dimensión & Problemas de altísima dimensionalidad pero con relaciones estructurales fuertes (ej. visión por computador, reconocimiento facial). & La inversión o resolución de sistemas lineales sobre la matriz Laplaciana del grafo exige generalmente una complejidad temporal de $O(n^3)$. \\ 
+\addlinespace
+
+Inferencia Transductiva (Grafos) & Suavidad y continuidad de las etiquetas sobre un dominio discreto interconectado & Sistemas basados en redes explícitas, como la propagación en redes sociales o la clasificación en redes de citación académica. & No infiere una función inductiva generalizable; la llegada de un único dato nuevo exige volver a resolver la asignación del sistema completo. \\ 
+\addlinespace
+
+Métodos Envolventes & Independencia condicional de vistas (Co-training) o confianza heurística iterativa & Casos de uso industrial donde el modelo base es complejo (caja negra) y se requiere una envoltura rápida sin alterar la función de pérdida interna. & Alto riesgo de propagación y amplificación iterativa de errores si las pseudoetiquetas iniciales de ``alta confianza'' resultan ser incorrectas. \\ 
+\addlinespace
+
+Preprocesado No Supervisado & La representación de los datos puede simplificarse capturando la estructura de $P(x)$ de forma agnóstica a las etiquetas & Reducción de ruido en alta dimensionalidad (PCA) o inicialización de redes neuronales profundas (Autoencoders). & Al ser una transformación ciega a las etiquetas, existe el riesgo de proyectar los datos eliminando información que era altamente discriminativa. \\ 
+
+\bottomrule
+\end{tabular}
+\end{table}
