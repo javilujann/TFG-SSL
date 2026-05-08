@@ -27,6 +27,11 @@ En definitiva, el \gls{SSL} ha demostrado de manera empírica ser una herramient
 \toprule
 \textbf{Familia de Algoritmos SSL} & \textbf{Suposición Matemática Fundamental} & \textbf{Escenario Práctico de Aplicación} & \textbf{Limitaciones y Complejidad Computacional} \\
 \midrule
+Métodos Envolventes & Independencia condicional de vistas (Co-training) o confianza heurística iterativa & Casos de uso industrial donde el modelo base es complejo (caja negra) y se requiere una envoltura rápida sin alterar la función de pérdida interna. & Alto riesgo de propagación y amplificación iterativa de errores si las pseudoetiquetas iniciales de ``alta confianza'' resultan ser incorrectas. \\ 
+\addlinespace
+
+Preprocesado No Supervisado & La representación de los datos puede simplificarse capturando la estructura de $P(x)$ de forma agnóstica a las etiquetas & Reducción de ruido en alta dimensionalidad (PCA) o inicialización de redes neuronales profundas (Autoencoders). & Al ser una transformación ciega a las etiquetas, existe el riesgo de proyectar los datos eliminando información que era altamente discriminativa. \\ 
+\addlinespace
 
 Métodos Generativos & Los datos provienen de un modelo de mezcla paramétrico que aproxima la distribución $P(x,y)$ & Tareas donde se tiene conocimiento previo experto sobre la distribución probabilística base (ej. genética). & Alta vulnerabilidad a la mala especificación del modelo; si el modelo paramétrico es incorrecto, el rendimiento decae drásticamente. \\ 
 \addlinespace
@@ -38,12 +43,6 @@ Regularización de Variedades & Los datos residen en subespacios difeomorfos de 
 \addlinespace
 
 Inferencia Transductiva (Grafos) & Suavidad y continuidad de las etiquetas sobre un dominio discreto interconectado & Sistemas basados en redes explícitas, como la propagación en redes sociales o la clasificación en redes de citación académica. & No infiere una función inductiva generalizable; la llegada de un único dato nuevo exige volver a resolver la asignación del sistema completo. \\ 
-\addlinespace
-
-Métodos Envolventes & Independencia condicional de vistas (Co-training) o confianza heurística iterativa & Casos de uso industrial donde el modelo base es complejo (caja negra) y se requiere una envoltura rápida sin alterar la función de pérdida interna. & Alto riesgo de propagación y amplificación iterativa de errores si las pseudoetiquetas iniciales de ``alta confianza'' resultan ser incorrectas. \\ 
-\addlinespace
-
-Preprocesado No Supervisado & La representación de los datos puede simplificarse capturando la estructura de $P(x)$ de forma agnóstica a las etiquetas & Reducción de ruido en alta dimensionalidad (PCA) o inicialización de redes neuronales profundas (Autoencoders). & Al ser una transformación ciega a las etiquetas, existe el riesgo de proyectar los datos eliminando información que era altamente discriminativa. \\ 
 
 \bottomrule
 \end{tabular}
