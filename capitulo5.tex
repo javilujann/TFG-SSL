@@ -1,16 +1,16 @@
 \chapter{Preprocesado no-supervisado de datos}
 
-La siguiente gran familia que vamos a presentar es la de los métodos de preprocesado no-supervisado de datos. La idea de esta familia es usar los datos no etiquetados en un paso previo al entrenamiento del modelo supervisado, con el objetivo de mejorar el rendimiento del modelo o reducir su complejidad \cite{van2020survey}.
+La siguiente gran familia que vamos a presentar es la de los métodos de preprocesado no-supervisado de datos. La idea de esta familia es usar los datos no etiquetados en un paso previo al entrenamiento supervisado del modelo, con el objetivo de mejorar su rendimiento o reducir su complejidad \cite{van2020survey}.
 
 Esta idea contrasta tanto con los métodos envolventes, que introducen los datos no etiquetados en el entrenamiento mediante el pseudoetiquetado, como con los métodos intrínsecos, que introducen los datos no etiquetados en el entrenamiento mediante la adición de términos no etiquetados a la función de pérdida. Esta diferencia es importante, ya que permite a los métodos de preprocesado no-supervisado de datos ser compatibles con cualquier modelo supervisado, sin necesidad de modificar su función de pérdida o su proceso de entrenamiento.
 
-Cada método de esta familia se distingue del resto por cómo implementa este \textit{paso previo}, aun así podemos identificar tres grandes categorías o subfamilias: Las basadas en la extracción de características, las basadas en el clustering y las basadas en el pre-entrenamiento de modelos.
+Cada método de esta familia se distingue del resto por cómo implementa este paso previo, aun así podemos identificar tres grandes categorías o subfamilias: Las basadas en la extracción de características, las basadas en el \textit{clustering} y las basadas en el pre-entrenamiento de modelos.
 
 \section{Extracción de características}
 
 Los métodos de extracción de características buscan transformar los datos de entrada de su representación original a una representación diferente que mejore el rendimiento del modelo o reduzca la complejidad del entrenamiento. Esta transformación se puede realizar de diferentes maneras, como por ejemplo reduciendo la dimensionalidad de los datos, seleccionando características o generando nuevas características a partir de las originales. 
 
-Uno de los métodos más conocidos de esta categoría es el \textbf{\gls{PCA}}, que busca encontrar una nueva representación de los datos en un espacio de menor dimensionalidad, donde las nuevas dimensiones son combinaciones lineales de las dimensiones originales que capturan la mayor parte de la varianza de los datos \cite{abdi2010principal}. El porqué de usar la varianza como criterio viene del siguiente teorema \cite{burges2010geometric}:
+Uno de los métodos más conocidos de esta categoría es el \gls{PCA}, que busca encontrar una nueva representación de los datos en un espacio de menor dimensionalidad, donde las nuevas dimensiones son combinaciones lineales de las dimensiones originales que capturan la mayor parte de la varianza de los datos \cite{abdi2010principal}. El porqué de usar la varianza como criterio viene del siguiente teorema \cite{burges2010geometric}:
 
 \begin{theo}
     Sea $\mathcal{X} \subseteq \mathbb{R}^d$ el dominio de las instancias y $\mathcal{D} = \{\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_n\}$ un conjunto de datos. Entonces, la proyección de los datos sobre un subespacio de dimensión $d' < d$ que maximiza la varianza de los datos proyectados es la misma proyección que minimiza la distancia entre los datos originales y su aproximación en el nuevo subespacio, es decir, la que minimiza la siguiente expresión: 
@@ -39,18 +39,18 @@ Uno de los métodos más conocidos de esta categoría es el \textbf{\gls{PCA}}, 
 
 Quedando establecido por qué se toma este criterio, el \gls{PCA} se implementa calculando la matriz de covarianza de los datos $C = \frac{1}{n} \sum_{i=1}^n \mathbf{x}_i \mathbf{x}_i^T$. Pues, maximizar la varianza es equivalente a maximizar la expresión $\sum_{j=1}^{d'} \mathbf{v}_j^T C \mathbf{v}_j$ bajo la restricción de que los vectores $\{\mathbf{v}_j\}$ sean ortonormales. Este problema de optimización se resuelve usando métodos analíticos y su solución son los autovectores de la matriz de covarianza $C$, de los cuales se eligen los $d'$ de mayor valor propio \cite{burges2010geometric}.
 
-El \gls{PCA} es solo un ejemplo de método de extracción de características, pero existen muchos otros, como los métodos basados en Autoencoders, que buscan aprender una representación comprimida de los datos mediante redes neuronales \cite{LI2023110176}. Lo que todos tienen en común es la idea base de hacer uso de los datos no etiquetados para transformar la representación de los datos de entrada, con el objetivo de mejorar el rendimiento del modelo supervisado o reducir su complejidad. 
+El \gls{PCA} es solo un ejemplo de método de extracción de características, pero existen muchos otros, como, por ejemplo, los métodos basados en Autoencoders, que buscan aprender una representación comprimida de los datos mediante redes neuronales \cite{LI2023110176}. En definitiva, La idea que todos tienen en común es hacer uso de los datos no etiquetados para transformar la representación de los datos de entrada, con el objetivo de mejorar el rendimiento del modelo supervisado o reducir su complejidad. 
 
 \section{Cluster-then-label}
 
-Los métodos de cluster-then-label cambian la idea anterior de realizar una transformación sobre los datos, por la idea de realizar una partición de los datos en clusters, y utilizar esta división del espacio para obtener mejoras en el rendimiento del modelo supervisado. Es decir, el \textit{paso previo} en esta categoría consiste en aplicar un algoritmo de clustering sobre todo el conjunto de datos, independientemente de si están etiquetados o no \cite{van2020survey}. 
+Los métodos de \textit{cluster-then-label} cambian la idea anterior de realizar una transformación sobre los datos, por la idea de realizar una partición de los datos en clústeres, y utilizar esta división del espacio para facilitar el entrenamiento del modelo supervisado. Es decir, el paso previo en esta categoría consiste en aplicar un algoritmo de \textit{clustering} sobre todo el conjunto de datos, independientemente de si están etiquetados o no \cite{van2020survey}. 
 
 Desde una perspectiva formal, este enfoque transforma el problema de encontrar una única función de clasificación compleja en el problema de encontrar múltiples funciones más simples sobre subconjuntos del espacio. Sea $\mathcal{X} \subseteq \mathbb{R}^d$ el espacio de características y $\mathcal{Y}$ el espacio de etiquetas. Dado el conjunto de datos total $D = D_l \cup D_u$, el proceso se divide matemáticamente en dos fases:
 
 \begin{enumerate}
-    \item \textbf{Fase de partición (Clustering):} Se aplica un algoritmo de aprendizaje no supervisado sobre $D$ para encontrar la partición del espacio $\mathcal{X}$ en clústeres $\{C_1, C_2, \dots, C_K\}$. Como resultado de este proceso, se obtiene una función de asignación $f_c: \mathcal{X} \rightarrow \{1, 2, \dots, K\}$ que mapea cada punto de manera unívoca a su clúster correspondiente, de tal forma que $C_k = \{x \in \mathcal{X} \mid f_c(x) = k\}$.
+    \item Fase de partición (\textit{Clustering}): Se aplica un algoritmo de aprendizaje no supervisado sobre $D$ para encontrar la partición del espacio $\mathcal{X}$ en clústeres $\{C_1, C_2, \dots, C_K\}$. Como resultado de este proceso, se obtiene una función de asignación $f_c: \mathcal{X} \rightarrow \{1, 2, \dots, K\}$ que mapea cada punto de manera unívoca a su clúster correspondiente, de tal forma que $C_k = \{x \in \mathcal{X} \mid f_c(x) = k\}$.
 
-    \item \textbf{Fase de clasificación (Labeling):} En lugar de optimizar una hipótesis global $h: \mathcal{X} \rightarrow \mathcal{Y}$ en un espacio de hipótesis $\mathcal{H}$ excesivamente complejo, se restringe el problema. Para cada clúster $C_k$, se entrena una hipótesis local $h_k \in \mathcal{H}_k$ utilizando únicamente el subconjunto de datos etiquetados que caen dentro de esa región, es decir, el conjunto $\{(x,y) \in D_l \mid f_c(x) = k\}$.
+    \item Fase de clasificación: En lugar de optimizar una hipótesis global $h: \mathcal{X} \rightarrow \mathcal{Y}$ en un espacio de hipótesis $\mathcal{H}$ excesivamente complejo, se restringe el problema. Para cada clúster $C_k$, se entrena una hipótesis local $h_k \in \mathcal{H}_k$ utilizando únicamente el subconjunto de datos etiquetados que caen dentro de esa región, es decir, el conjunto $\{(x,y) \in D_l \mid f_c(x) = k\}$.
 \end{enumerate}
 
 Finalmente, el clasificador global semi-supervisado se define como una función definida a trozos, donde la predicción para una nueva instancia $x$ viene dada por el modelo local de su clúster correspondiente:
@@ -61,11 +61,11 @@ Finalmente, el clasificador global semi-supervisado se define como una función 
 
 donde $\mathbb{I}(\cdot)$ es la función indicadora. Esta formulación permite que la estructura subyacente revelada por los datos no etiquetados (la partición) reduzca drásticamente la complejidad funcional del aprendizaje supervisado posterior.
 
-Al igual que antes, existen diferentes enfoques a la hora de aplicar esta idea que varían en función del algoritmo de clustering elegido y de la forma en la que se utiliza la partición obtenida para mejorar el rendimiento del modelo supervisado.
+Al igual que antes, existen diferentes enfoques a la hora de aplicar esta idea que varían en función del algoritmo de \textit{clustering} elegido y de la forma en la que se utiliza la partición obtenida para mejorar el rendimiento del modelo supervisado.
 
-Un posible enfoque es el propuesto por \citet{pmlr-v5-goldberg09a}, que se basa en la idea de que los datos pueden estar distribuidos en diferentes subespacios o variedades, y que cada una de estas variedades puede ser modelada por un algoritmo de clustering diferente. En este enfoque, se aplica un algoritmo de clustering no supervisado para identificar estas variedades, y luego se entrena un modelo supervisado para cada variedad utilizando solo las muestras etiquetadas que pertenecen a dicha variedad. De esta forma, se obtiene un conjunto de modelos supervisados especializados en cada variedad, lo que puede mejorar el rendimiento del modelo global.
+Un posible enfoque es el propuesto por \citet{pmlr-v5-goldberg09a}, que se basa en la idea de que los datos pueden estar distribuidos en diferentes subespacios, y que cada uno de estos subespacios puede ser modelado por un algoritmo de \textit{clustering} diferente. En este enfoque, se aplica un algoritmo de \textit{clustering} no supervisado para identificar estos subespacios, y luego se entrena un modelo supervisado para cada subespacio utilizando solo las muestras etiquetadas que pertenecen a dicha variedad. De esta forma, se obtiene un conjunto de modelos supervisados specializados en cada subespacio, lo que puede mejorar el rendimiento del modelo global.
 
-O el de \citet{demiriz1999semi} donde se utiliza un algoritmo de clustering semi-supervisado que combina tanto la información de los datos no etiquetados como la información de las muestras etiquetadas para realizar la partición del espacio.
+O el de \citet{demiriz1999semi} donde se utiliza un algoritmo de \textit{clustering} semi-supervisado que combina tanto la información de los datos no etiquetados como la información de las muestras etiquetadas para realizar la partición del espacio.
 
 En general, el concepto siempre es el mismo, hacer uso de los datos no etiquetados para realizar una partición del espacio, y luego utilizar esta partición para mejorar el rendimiento del modelo supervisado. Sin embargo, las formas de implementar esta idea pueden variar mucho, y cada una de ellas puede ser más adecuada para ciertos tipos de datos o problemas específicos.
 
@@ -76,18 +76,18 @@ Los métodos de pre-entrenamiento de modelos buscan aprovechar los datos no etiq
 
 Este tipo de métodos es especialmente útil en el contexto de las \glspl{DNN}, donde la inicialización de los parámetros puede tener un gran impacto en el rendimiento del modelo supervisado, pues los algoritmos de entrenamiento pueden converger lentamente o presentar problemas de optimización. La idea general consiste en entrenar los parámetros de las capas inferiores de la \gls{DNN} utilizando los datos no etiquetados, y luego fine-tunear el modelo con los datos etiquetados \cite{hinton2006fast,vincent2008extracting}.
 
-Para ilustrar este proceso desde un punto de vista matemático, el enfoque más representativo es el uso de \textbf{\glspl{AE}} apilados. Un \gls{AE} es una red neuronal diseñada para aprender la función identidad, es decir, para reconstruir su propia entrada, pero forzando al modelo a aprender una representación latente útil \cite{van2020survey}.
+Para ilustrar este proceso desde un punto de vista matemático, el enfoque más representativo es el uso de \glspl{AE} apilados. Un \gls{AE} es una red neuronal diseñada para aprender la función identidad, es decir, para reconstruir su propia entrada, pero forzando al modelo a aprender una representación latente útil \cite{van2020survey}.
 
 Formalmente, dado un conjunto de datos no etiquetados $D_u = \{x_1, \dots, x_m\}$ donde $x_i \in \mathbb{R}^d$, un \gls{AE} estándar se compone de dos funciones \cite{LI2023110176}:
 
 \begin{enumerate}
-    \item \textbf{El codificador (Encoder) $h$}: Mapea el vector de entrada $x$ a una representación latente oculta $z \in \mathbb{R}^{d'}$, típicamente de menor dimensión ($d' < d$). Se define como:
+    \item \textbf{El codificador (\textit{Encoder}) $h$}: Mapea el vector de entrada $x$ a una representación latente oculta $z \in \mathbb{R}^{d'}$, típicamente de menor dimensión ($d' < d$). Se define como:
     \begin{equation}
         z = h(x) = \sigma(W_1 x + b_1)
     \end{equation}
     donde $W_1 \in \mathbb{R}^{d' \times d}$ es la matriz de pesos, $b_1 \in \mathbb{R}^{d'}$ es el vector sesgo, y $\sigma$ es una función de activación no lineal (como sigmoide o ReLU).
     
-    \item \textbf{El decodificador (Decoder) $g$}: Intenta reconstruir la entrada original a partir de la representación latente. Se define como:
+    \item \textbf{El decodificador (\textit{Decoder}) $g$}: Intenta reconstruir la entrada original a partir de la representación latente. Se define como:
     \begin{equation}
         \hat{x} = g(z) = \sigma(W_2 z + b_2)
     \end{equation}
@@ -100,6 +100,6 @@ El pre-entrenamiento no supervisado consiste en encontrar los parámetros $\thet
     \mathcal{L}_{AE}(\theta) = \frac{1}{m} \sum_{i=1}^{m} \|x_i - g(h(x_i))\|^2
 \end{equation}
 
-Al minimizar esta función utilizando los datos no etiquetados, los pesos $W_1$ y $b_1$ del codificador aprenden a capturar la estructura subyacente de los datos. En el contexto del pre-entrenamiento de redes profundas, una vez que este \gls{AE} es entrenado, se descarta el decodificador $g$, y los parámetros optimizados $W_1$ y $b_1$ se utilizan como la \textbf{inicialización exacta} para la primera capa oculta del modelo supervisado final. Este proceso puede repetirse secuencialmente capa por capa (\glspl{AE} apilados) antes de aplicar el \textit{fine-tuning} con los datos etiquetados mediante retropropagación estándar \cite{vincent2008extracting}.
+Al minimizar esta función utilizando los datos no etiquetados, los pesos $W_1$ y $b_1$ del codificador aprenden a capturar la estructura subyacente de los datos. En el contexto del pre-entrenamiento de redes profundas, una vez que este \gls{AE} es entrenado, se descarta el decodificador $g$, y los parámetros optimizados $W_1$ y $b_1$ se utilizan como la inicialización exacta para la primera capa oculta del modelo supervisado final. Este proceso puede repetirse secuencialmente capa por capa (\glspl{AE} apilados) antes de aplicar el \textit{fine-tuning} con los datos etiquetados mediante retropropagación estándar \cite{vincent2008extracting}.
 
 Desde el punto de vista teórico, las diferentes capas de las \glspl{DNN} pueden ser vistas como diferentes niveles de abstracción en la representación de los datos, donde las capas inferiores capturan características más simples y las capas superiores capturan características más complejas. Por lo tanto, el pre-entrenamiento de modelos busca empujar al modelo hacia una mejor representación de los datos desde el principio del entrenamiento. Por lo tanto, estos métodos están íntimamente relacionados con los métodos de extracción de características, aunque con la diferencia de que el pre-entrenamiento de modelos se centra en la inicialización de los parámetros del modelo supervisado que son posteriormente modificados en el entrenamiento, mientras que en los métodos de extracción de características la transformación de la representación de los datos de entrada realizada es permanente \cite{van2020survey}. 

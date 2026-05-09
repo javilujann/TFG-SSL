@@ -4,9 +4,9 @@ En este capítulo se describen los métodos intrínsecamente semi-supervisados, 
 
 Siguiendo la última división de los métodos inductivos presentada en la taxonomía del Capítulo 3, organizamos los métodos intrínsecos en tres grandes grupos: métodos generativos, métodos discriminativos y métodos basados en variedades. En cada caso se introduce la intuición del enfoque y se presentan formulaciones representativas: mezclas de modelos optimizadas con EM, clasificadores de máximo margen como las S3VM y métodos basados en perturbaciones como las \textit{ladder networks}, y, finalmente, técnicas de regularización de la variedad mediante grafos.
 
-\section{Generativos}
+\section{Métodos Generativos}
 
-Los métodos generativos constituyen uno de los enfoques clásicos del aprendizaje semi-supervisado \cite{zhu2005semi}. Su idea central es modelar explícitamente el proceso que genera los datos, esto es, la distribución conjunta $p(\mathbf{x},y)$, y, una vez estimada, usarla de diferentes formas para clasificar \cite{van2020survey}. Este enfoque conecta directamente con la discusión del Capítulo 2 sobre cómo la información de $p(\mathbf{x})$ puede ayudar a inferir $p(y\mid\mathbf{x})$ (Sección \ref{sec:suposiciones}).
+Los métodos generativos constituyen uno de los enfoques clásicos del \gls{SSL} \cite{zhu2005semi}. Su idea central es modelar explícitamente el proceso que genera los datos, esto es, la distribución conjunta $p(\mathbf{x},y)$, y, una vez estimada, usarla de diferentes formas para clasificar \cite{van2020survey}. Este enfoque conecta directamente con la discusión del Capítulo 2 sobre cómo la información de $p(\mathbf{x})$ puede ayudar a inferir $p(y\mid\mathbf{x})$ (Sección \ref{sec:suposiciones}).
 
 Dentro de esta familia, el referente clásico son los modelos de mezcla optimizados mediante máxima verosimilitud, normalmente con el algoritmo \gls{EM} cuando hay variables latentes \cite{dempster1977maximum}.
 
@@ -14,7 +14,7 @@ Dentro de esta familia, el referente clásico son los modelos de mezcla optimiza
 
 Los modelos de mezcla asumen que los datos se generan a partir de una combinación de componentes probabilísticas, típicamente una por clase, con parámetros desconocidos \cite{van2020survey}. Bajo este supuesto, los datos etiquetados y no etiquetados pueden contribuir conjuntamente a estimar el modelo.
 
-La intuición en semi-supervisado es que los datos no etiquetados ayudan a identificar la estructura de la mezcla (componentes, pesos y forma), mientras que los pocos datos etiquetados permiten asociar componentes a clases \cite{zhu2005semi,zhu2009introduction}.
+La intuición para el \gls{SSL} es que los datos no etiquetados ayudan a identificar la estructura de la mezcla (componentes, pesos y forma), mientras que los pocos datos etiquetados permiten asociar componentes a clases \cite{zhu2005semi,zhu2009introduction}.
 
 \subsubsection{Mezcla de modelos supervisada}
 
@@ -74,9 +74,9 @@ Esta dinámica es conceptualmente parecida al pseudoetiquetado de los métodos e
 La mezcla de modelos es un enfoque que puede ser muy eficaz cuando el modelo generativo está bien especificado. Sin embargo, su rendimiento depende críticamente de hipótesis como la identificabilidad de la mezcla y la corrección del modelo; si estas fallan, los datos no etiquetados pueden degradar el rendimiento \cite{zhu2005semi,van2020survey}.
 
 
-\section{Discriminativos}
+\section{Métodos Discriminativos}
 
-Esta familia de métodos se distingue de la anterior en que no trata de modelar el proceso generativo ni la densidad conjunta $p(\mathbf{x},y)$, sino que se centra directamente en aprender un modelo discriminativo $p(y\mid\mathbf{x})$ o una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ \cite{ng2001discriminative}. En este caso, la información de los datos no etiquetados se incorpora con el objetivo de mejorar la generalización del modelo, normalmente a través de suposiciones adicionales sobre la distribución subyacente de los datos (por ejemplo, la separación en baja densidad o la suposición de suavidad) \cite{van2020survey}.
+Esta familia de métodos se distingue de la anterior en que no trata de modelar el proceso generativo ni la densidad conjunta $p(\mathbf{x},y)$, sino que se centra en aprender directamente la probabilidad condicional $p(y\mid\mathbf{x})$ o un clasificador $f:\mathcal{X}\to\mathcal{Y}$ \cite{ng2001discriminative}. En este caso, la información de los datos no etiquetados se incorpora con el objetivo de mejorar la generalización del modelo, normalmente a través de suposiciones adicionales sobre la distribución subyacente de los datos (por ejemplo, la separación en baja densidad o la suposición de suavidad) \cite{van2020survey}.
 \subsection{Máximo margen}
 \label{subsec:maximo_margen}
 
@@ -102,7 +102,7 @@ La distancia sin signo de un punto $\mathbf{x}$ a dicho hiperplano es $\frac{|f(
 \gamma = \min_{i=1,\dots,l} \frac{y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)}{\|\mathbf{w}\|}.
 \end{equation}
 
-Primero, vamos a asumir que los datos son \textit{linealmente separables}, es decir, que existe un hiperplano tal que $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)>0$ para todo $i=1,\dots,l$. Bajo esta suposición, una \textit{hard-margin} \gls{SVM} busca el hiperplano separador que maximiza $\gamma$, lo que puede escribirse como
+Primero, vamos a asumir que los datos son linealmente separables, es decir, que existe un hiperplano tal que $y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)>0$ para todo $i=1,\dots,l$. Bajo esta suposición, una \textit{hard-margin} \gls{SVM} busca el hiperplano separador que maximiza $\gamma$, lo que puede escribirse como
 
 \begin{equation}
 \max_{\mathbf{w},b} \quad \min_{i=1,\dots,l} \frac{y_i\bigl(\mathbf{w}^{\top}\mathbf{x}_i+b\bigr)}{\|\mathbf{w}\|}.
@@ -128,7 +128,7 @@ Ahora, si los datos no son separables (esto es, no existe un hiperplano que sepa
 
 Intuitivamente, $\xi_i$ mide cuánto viola el ejemplo $i$ la restricción de margen: $\xi_i=0$ significa que se cumple el margen, $0<\xi_i<1$ indica que el punto queda dentro del margen pero sigue estando bien clasificado, y $\xi_i>1$ corresponde a una clasificación errónea.  
 
-Finalmente, con el fin de expresar el problema en el marco de la minimización de riesgo regularizado (Sección \ref{sec:perdida_regularizacion}). Se puede despejar $\xi_i$ de $y_i f(\mathbf{x}_i) \ge 1-\xi_i$ obteniendo $\xi_i\ge 1-y_if(\mathbf{x}_i)$, que junto a $\xi_i\ge 0$ es equivalente a $\xi_i=\max\bigl(0,1-y_if(\mathbf{x}_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
+Finalmente, con el fin de expresar el problema en el marco de la \gls{RRM} (Sección \ref{sec:perdida_regularizacion}). Se puede despejar $\xi_i$ de $y_i f(\mathbf{x}_i) \ge 1-\xi_i$ obteniendo $\xi_i\ge 1-y_if(\mathbf{x}_i)$, que junto a $\xi_i\ge 0$ es equivalente a $\xi_i=\max\bigl(0,1-y_if(\mathbf{x}_i)\bigr)$. Por lo tanto, la función objetivo se reescribe como
 \begin{equation}
 \min_{\mathbf{w},b} \quad \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(\mathbf{x}_i)\bigr).
 \end{equation}
@@ -136,14 +136,14 @@ En este caso la función de pérdida es $c(\mathbf{x},y,f(\mathbf{x})) = \max\bi
 
 \subsubsection{S3VM}
 
-La idea central de las \gls{S3VM} es incorporar el conjunto no etiquetado $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ penalizando que dichos puntos queden cerca de la frontera, i.e., se prefiere que $|f(\mathbf{x}_j)|$ sea grande, de modo que la frontera se sitúe en regiones de baja densidad \cite{van2020survey,10.7551/mitpress/9780262033589.001.0001}. Una forma estándar de derivar esta penalización es introducir etiquetas latentes $\hat{y}_j\in\{-1,1\}$ para los ejemplos no etiquetados y añadir un término de pérdida \textit{hinge} $\max\bigl(0,1-\hat{y}_j f(\mathbf{x}_j)\bigr)$, que como los puntos se suponen \textit{correctamente} clasificados se convierte en $\max\bigl(0,1-|f(\mathbf{x}_j)|\bigr)$, conocida como \textit{hat loss} \cite{10.7551/mitpress/9780262033589.001.0001}.
+La idea central de las \gls{S3VM} es incorporar el conjunto no etiquetado $\{\mathbf{x}_j\}_{j=l+1}^{l+u}$ penalizando que dichos puntos queden cerca de la frontera, i.e., se prefiere que $|f(\mathbf{x}_j)|$ sea grande, de modo que la frontera se sitúe en regiones de baja densidad \cite{van2020survey,10.7551/mitpress/9780262033589.001.0001}. Una forma estándar de derivar esta penalización es introducir etiquetas latentes $\hat{y}_j\in\{-1,1\}$ para los ejemplos no etiquetados y añadir un término de pérdida \textit{hinge} $\max\bigl(0,1-\hat{y}_j f(\mathbf{x}_j)\bigr)$, que como los puntos se suponen correctamente clasificados se convierte en $\max\bigl(0,1-|f(\mathbf{x}_j)|\bigr)$, conocida como \textit{hat loss} \cite{10.7551/mitpress/9780262033589.001.0001}.
 
 Con ello, una formulación típica de \gls{S3VM} es
 \begin{equation}
 \min_{\mathbf{w},b} \quad \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \max\bigl(0, 1 - y_i f(\mathbf{x}_i)\bigr) + C^* \sum_{j=l+1}^{l+u} \max\bigl(0, 1 - |f(\mathbf{x}_j)|\bigr).
 \end{equation}
 
-En términos del marco de la Sección \ref{sec:perdida_regularizacion}, el sumatorio sobre los datos no etiquetados puede interpretarse como un funcional no supervisado, que incorpora explícitamente la suposición de separación en baja densidad.
+En términos del marco de \gls{RRM} (Sección \ref{sec:perdida_regularizacion}), el sumatorio sobre los datos no etiquetados puede interpretarse como un funcional no supervisado, que incorpora explícitamente la suposición de separación en baja densidad.
 
 En la práctica suele ser necesario imponer alguna restricción adicional (por ejemplo, sobre el balance de etiquetas asignadas a los datos no etiquetados) para evitar soluciones degeneradas \cite{van2020survey}. Además, el problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados. Finalmente, destacar que si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
 
@@ -182,7 +182,8 @@ La función de pérdida total a optimizar se puede formular de la siguiente mane
 Donde $\mathbf{z}_i^k$ es la activación oculta de la capa $k$ en el codificador para el ejemplo limpio $\mathbf{x}_i$, mientras que $\hat{\mathbf{z}}_i^k$ es la activación reconstruida por el decodificador a partir de la versión perturbada. Finalmente, $\text{ReconstructionLoss}$ es una función que penaliza la discrepancia entre ambas (como, por ejemplo, la norma $L_2$ al cuadrado) \cite{rasmus2015semi}.
 
 A través de esta arquitectura, las \textit{ladder networks} consiguen aprovechar simultáneamente tanto la señal de los datos etiquetados como la regularización proporcionada por los datos no etiquetados\footnote{Esta simultaneidad es, de hecho, lo que hace a las \textit{ladder networks} modelos intrínsecos, a diferencia del preentrenamiento por capas visto en la Sección \ref{sec:pre-training}, donde se usaba un \textit{encoder-decoder} como fase inicial independiente seguida de la fase supervisada.}, forzando a la red a extraer características latentes útiles y robustas al ruido que, en última instancia, mejoran la generalización del modelo predictivo \cite{rasmus2015semi}.
-\section{Basados en variedades}
+
+\section{Métodos Basados en Variedades}
 \label{sec:variedades}
 
 Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque (al igual que los métodos discriminativos) se centran en aprender una función de decisión, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
@@ -195,7 +196,7 @@ Una forma habitual de aproximar la variedad subyacente es construir un grafo de 
 
 Usualmente se denota por $W=(w_{ij})$ a la matriz de pesos, y la intuición es que, si $w_{ij}$ es alto, entonces es más probable que ambas instancias compartan etiqueta \cite{zhu2009introduction}. Hay varias formas de definir la vecindad y/o la similitud entre nodos, que se verán con mayor profundidad en el siguiente capítulo.
 
-Una vez construido el grafo, se busca una función de decisión $f:\mathcal{X}\to\mathcal{Y}$ que no solo clasifique correctamente los ejemplos etiquetados, sino que también sea suave respecto a la estructura del grafo; es decir, que produzca salidas similares en nodos conectados por aristas con pesos altos \cite{zhu2009introduction}.
+Una vez construido el grafo, se busca un modelo $f:\mathcal{X}\to\mathcal{Y}$ que no solo clasifique correctamente los ejemplos etiquetados, sino que también sea suave respecto a la estructura del grafo; es decir, que produzca salidas similares en nodos conectados por aristas con pesos altos \cite{zhu2009introduction}.
 
 Para ello, un enfoque representativo es el propuesto por \citet{belkin2005manifold}. Partiendo de un marco de aprendizaje supervisado, se considera un kernel $K$, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Y se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
 

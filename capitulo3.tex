@@ -32,12 +32,12 @@ Esta distinción es muy útil pues permite comprender los fundamentos que hay de
 \subsection{Basado en el uso de los datos no etiquetados}
 \label{sec:div-uso-etiquetas}
 
-Finalmente, se presenta una última característica discriminante, la forma en la que los diferentes algoritmos hacen uso de los datos no etiquetados. Esta característica es la base de la taxonomía que se presenta en el trabajo de \citet{van2020survey}, y por ende es la base de la taxonomía presentada en este trabajo.
+Finalmente, se presenta una última característica discriminante, la forma en la que los diferentes métodos hacen uso de los datos no etiquetados. Esta característica es la base de la taxonomía que se presenta en el trabajo de \citet{van2020survey}, y por ende es la base de la taxonomía presentada en este trabajo.
 
 Esta característica clasifica los algoritmos de \gls{SSL} en tres grupos: 
 \begin{itemize}
-    \item Los métodos \textbf{Envolventes} o \textbf{Wrapper}, métodos que se basan en un paso de pseudo-etiquetado. Es decir, se basan en un proceso que utiliza uno o varios algoritmos supervisados, que parten solo con los datos etiquetados, y va iterativamente etiquetando parte de los datos no etiquetados usando estos algoritmos, para posteriormente reentrenarlos usando estas nuevas etiquetas, sin que estos distingan la diferencia entre etiquetas iniciales y etiquetadas por el proceso. 
-    \item Los métodos basados en \textbf{preprocesado no supervisado}, aquellos que se basan en un pipeline de dos etapas: una primera etapa de preprocesamiento no supervisado, que puede ser por ejemplo una etapa de reducción de dimensionalidad o de extracción de características, seguida de una etapa de clasificación donde un algoritmo supervisado, agnóstico a la etapa anterior, se entrena con los datos etiquetados y  la representación obtenida en la primera etapa.
+    \item Los métodos \textbf{Envolventes} o \textbf{\textit{Wrapper}}, métodos que se basan en un paso de pseudo-etiquetado. Es decir, se basan en un proceso que utiliza uno o varios algoritmos supervisados, que parten solo con los datos etiquetados, y va iterativamente etiquetando parte de los datos no etiquetados usando los modelos supervisados obtenidos, para posteriormente reentrenarlos usando estas nuevas etiquetas, sin que estos distingan la diferencia entre etiquetas iniciales y etiquetadas por el proceso. 
+    \item Los métodos basados en \textbf{preprocesado no supervisado}, aquellos que se basan en un pipeline de dos etapas: una primera etapa de preprocesamiento no supervisado, que puede ser por ejemplo una etapa de reducción de dimensionalidad o de extracción de características, seguida de una etapa de clasificación donde un modelo supervisado, agnóstico a la etapa anterior, se entrena con los datos etiquetados y  la representación obtenida en la primera etapa.
     \item Los métodos \textbf{intrínsecamente semi-supervisados}, que directamente optimizan una función objetivo haciendo uso tanto de los datos etiquetados como los no etiquetados. Por tanto, no necesitan pasos intermedios ni algoritmos supervisados de base, sino que usualmente son extensiones de estos algoritmos supervisados que integran de manera explícita los datos no etiquetados en su formulación matemática.
 \end{itemize}
 
@@ -49,7 +49,7 @@ Basándose en todo lo explicado anteriormente, se presenta en la figura \ref{fig
 
 \begin{enumerate}
     \item Primero, se distingue entre los métodos inductivos o transductivos.
-    \item Una vez clasificados en base a esta característica, se considera cómo el algoritmo hace uso de los datos no etiquetados.
+    \item Una vez clasificados en base a esta característica, se considera cómo el método hace uso de los datos no etiquetados.
     \item Finalmente, dentro de los métodos inductivos e intrínsecamente semi-supervisados, se realiza una última distinción basada en el fundamento matemático del método, distinguiendo entre métodos generativos y discriminantes, añadiendo además una tercera rama para los métodos geométricos (basados en variedades).
 \end{enumerate}
 
@@ -72,5 +72,5 @@ Sin embargo, y aquí aparece la primera diferencia, para realizar esta taxonomí
 
 De esta forma, la taxonomía propuesta reorganiza los métodos intrínsecos en tres ramas diferenciadas: la familia de métodos generativos; la de métodos discriminantes —que agrupa bajo un mismo paraguas conceptual a los enfoques de máximo margen y a los basados en perturbaciones—; y finalmente, una categoría independiente para los métodos basados en variedades, reconociendo así su naturaleza geométrica distintiva.
 
-Además, se ha añadido un pequeño cambio dentro de los métodos envolventes, se ha renombrado co-training por \textit{métodos basados en desacuerdo}. De esta manera, se evita nombrar a la familia por un algoritmo en concreto dentro de esta. El nuevo nombre refleja la idea general de esta familia de métodos tal y como se presenta en el trabajo de \citet{zhou2010semi}.
+Además, se ha añadido un pequeño cambio dentro de los métodos envolventes, se ha renombrado co-training por \textbf{métodos basados en desacuerdo}. De esta manera, se evita nombrar a la familia por un algoritmo en concreto dentro de esta. El nuevo nombre refleja la idea general de esta familia de métodos tal y como se presenta en el trabajo de \citet{zhou2010semi}.
 
