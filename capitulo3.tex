@@ -1,4 +1,5 @@
 \chapter{Taxonomía de métodos de aprendizaje semi-supervisado}
+\label{cap:taxonomy}
 
 En este capítulo se va a presentar una taxonomía de los diferentes métodos de clasificación bajo el enfoque de \gls{SSL}. Su objetivo es permitir un entendimiento claro de la base de los diferentes métodos con el fin de facilitar su comprensión y estudio. Para realizarla se ha utilizado como estructura principal la taxonomía presentada en \citet{van2020survey}, a la que se le han realizado ciertas modificaciones debidamente motivadas buscando una mejor comprensión y adaptación a los objetivos de este trabajo.
 
@@ -11,7 +12,7 @@ Antes de exponer la taxonomía, se van a introducir posibles características di
 
 Como se explicó al final del último capítulo las diferentes suposiciones sobre cómo se relacionan los datos etiquetados y no etiquetados es una característica básica a la hora de entender los diferentes métodos de \gls{SSL}. Es por esto que surge rápidamente como una posible característica discriminante a la hora de clasificar los diferentes métodos, como por ejemplo se hace en \citet{10.7551/mitpress/9780262033589.001.0001}.
 
-Sin embargo, clasificar en base a esta característica no es ni tan sencillo ni tan claro como parece a primera vista. Por un lado, las suposiciones teóricas a menudo se solapan conceptualmente, o son compartidas por diferentes algoritmos cuya implementación matemática difiere radicalmente. Además, hay ciertos algoritmos de \gls{SSL} -- como los métodos \textit{wrapper,} que se presentarán más adelante--, que no se basan en suposiciones explícitas sobre los datos, por lo que una clasificación por esta característica resulta incompleta.  Por tanto, aunque es importante conocer la suposición de cada algoritmo a la hora de trabajar con él, una clasificación en base a esta característica puede no resultar suficientemente esclarecedora para entender las ideas y fundamentos en los que se basa.
+Sin embargo, clasificar en base a esta característica no es ni tan sencillo ni tan claro como parece a primera vista. Por un lado, las suposiciones teóricas a menudo se solapan conceptualmente, o son compartidas por diferentes algoritmos cuya implementación matemática difiere radicalmente. Además, hay ciertos algoritmos de \gls{SSL}, como los métodos \textit{wrapper} que se presentarán más adelante, que no se basan en suposiciones explícitas sobre los datos, por lo que una clasificación por esta característica resulta incompleta.  Por tanto, aunque es importante conocer la suposición de cada algoritmo a la hora de trabajar con él, una clasificación en base a esta característica puede no resultar suficientemente esclarecedora para entender las ideas y fundamentos en los que se basa.
 
 \subsection{Inductivo vs transductivo}
 \label{sec:div-inductivo-transductivo}
@@ -27,7 +28,7 @@ Otro criterio de clasificación estándar en la literatura, sobre todo la más c
 
 Este criterio clasifica los métodos en dos tipos: Los métodos \textbf{generativos} que buscan aprender un modelo de la probabilidad conjunta de los datos $p(x,y)$, de las entradas $x$, y de las etiquetas $y$, para hacer predicciones usando la regla de Bayes para calcular $p(y|x)$ y seleccionando la etiqueta más probable. Y los métodos \textbf{discriminantes} que se centran en modelar directamente la probabilidad a posteriori $p(y|x)$ o aprenden un mapeo directo de las entradas a las etiquetas \cite{ng2001discriminative}.
 
-Esta distinción es muy útil pues permite comprender los fundamentos que hay detrás de un método, antes de abordar los detalles de su implementación concreta. Sin embargo, no es una distinción perfecta, ya que no contempla todos los posibles métodos, en particular, los métodos que se basan en la geometría o topología de los datos --como los métodos basados en grafos o variedades--.
+Esta distinción es muy útil pues permite comprender los fundamentos que hay detrás de un método, antes de abordar los detalles de su implementación concreta. Sin embargo, no es una distinción perfecta, ya que no contempla todos los posibles métodos, en particular, los métodos que se basan en la geometría o topología de los datos, como los métodos basados en grafos o variedades.
 
 \subsection{Basado en el uso de los datos no etiquetados}
 \label{sec:div-uso-etiquetas}

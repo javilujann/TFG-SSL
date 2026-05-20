@@ -1,8 +1,8 @@
 \chapter{Métodos intrínsecamente semi-supervisados}
 
-En este capítulo se describen los métodos intrínsecamente semi-supervisados, es decir, aquellos que desde su concepción están diseñados para entrenar de manera conjunta con datos etiquetados y no etiquetados. Su rasgo distintivo es que los ejemplos no etiquetados no aparecen como una etapa auxiliar o previa, sino que se incorporan de forma explícita en la formulación del método: bien a través de un modelo probabilístico (por ejemplo, en la verosimilitud de $p(\mathbf{x},y)$), o bien como términos adicionales en la función objetivo (por ejemplo, regularización, consistencia o suavidad).
+En este capítulo se describen los métodos intrínsecamente semi-supervisados, es decir, aquellos que desde su concepción están diseñados para entrenar de manera conjunta con datos etiquetados y no etiquetados. Su rasgo distintivo es que los ejemplos no etiquetados no aparecen como una etapa auxiliar o previa, sino que se incorporan de forma explícita en la formulación del método bien a través de un modelo probabilístico, por ejemplo, en la verosimilitud de $p(\mathbf{x},y)$; o bien como términos adicionales en la función objetivo, mediante regularización, consistencia o suavidad.
 
-Siguiendo la última división de los métodos inductivos presentada en la taxonomía del Capítulo 3, organizamos los métodos intrínsecos en tres grandes grupos: métodos generativos, métodos discriminativos y métodos basados en variedades. En cada caso se introduce la intuición del enfoque y se presentan formulaciones representativas: mezclas de modelos optimizadas con EM, clasificadores de máximo margen como las S3VM y métodos basados en perturbaciones como las \textit{ladder networks}, y, finalmente, técnicas de regularización de la variedad mediante grafos.
+Siguiendo la última división de los métodos inductivos presentada en la taxonomía del Capítulo \ref{cap:taxonomy}, organizamos los métodos intrínsecos en tres grandes grupos: métodos generativos, métodos discriminativos y métodos basados en variedades. En cada caso se introduce la intuición del enfoque y se presentan formulaciones representativas: mezclas de modelos optimizadas con EM, clasificadores de máximo margen como las S3VM y métodos basados en perturbaciones como las \textit{ladder networks}, y, finalmente, técnicas de regularización de la variedad mediante grafos.
 
 \section{Métodos Generativos}
 
@@ -14,7 +14,7 @@ Dentro de esta familia, el referente clásico son los modelos de mezcla optimiza
 
 Los modelos de mezcla asumen que los datos se generan a partir de una combinación de componentes probabilísticas, típicamente una por clase, con parámetros desconocidos \cite{van2020survey}. Bajo este supuesto, los datos etiquetados y no etiquetados pueden contribuir conjuntamente a estimar el modelo.
 
-La intuición para el \gls{SSL} es que los datos no etiquetados ayudan a identificar la estructura de la mezcla (componentes, pesos y forma), mientras que los pocos datos etiquetados permiten asociar componentes a clases \cite{zhu2005semi,zhu2009introduction}.
+La intuición para el \gls{SSL} es que los datos no etiquetados ayudan a identificar la estructura de la mezcla: componentes, pesos y forma; mientras que los pocos datos etiquetados permiten asociar componentes a clases \cite{zhu2005semi,zhu2009introduction}.
 
 \subsubsection{Mezcla de modelos supervisada}
 
@@ -45,7 +45,7 @@ Es decir, buscamos los parámetros $\theta$ que maximizan la verosimilitud de lo
      = \sum_{i=1}^{l} \log \bigl(p(y_i|\theta)p(\mathbf{x}_i|y_i,\theta)\bigr).
 \end{equation}
 
-Para familias concretas (por ejemplo, mezclas gaussianas con etiquetas observadas), este problema suele admitir estimadores cerrados o de optimización relativamente directa \cite{zhu2009introduction}.
+Para familias concretas, como mezclas gaussianas con etiquetas observadas, este problema suele admitir estimadores cerrados o de optimización relativamente directa \cite{zhu2009introduction}.
 
 \subsubsection{Mezcla de modelos semi-supervisada}
 
@@ -117,7 +117,7 @@ Este problema es invariante frente a escalado, es decir, si multiplicamos $(\mat
 \end{aligned}
 \end{equation}
 
-Ahora, si los datos no son separables (esto es, no existe un hiperplano que separe perfectamente las clases), se introduce el \textit{soft margin} mediante variables de holgura $\xi_i\ge 0$ y un parámetro $C>0$ que controla el compromiso entre maximizar el margen y minimizar errores, tal y como se muestra a continuación.
+Ahora, si los datos no son separables, i.e., no existe un hiperplano que separe perfectamente las clases, se introduce el \textit{soft margin} mediante variables de holgura $\xi_i\ge 0$ y un parámetro $C>0$ que controla el compromiso entre maximizar el margen y minimizar errores, tal y como se muestra a continuación.
 \begin{equation}
 \begin{aligned}
 \min_{\mathbf{w},b} \quad & \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^l \xi_i \\
@@ -145,7 +145,7 @@ Con ello, una formulación típica de \gls{S3VM} es
 
 En términos del marco de \gls{RRM} (Sección \ref{sec:perdida_regularizacion}), el sumatorio sobre los datos no etiquetados puede interpretarse como un funcional no supervisado, que incorpora explícitamente la suposición de separación en baja densidad.
 
-En la práctica suele ser necesario imponer alguna restricción adicional (por ejemplo, sobre el balance de etiquetas asignadas a los datos no etiquetados) para evitar soluciones degeneradas \cite{van2020survey}. Además, el problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados. Finalmente, destacar que si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
+En la práctica suele ser necesario imponer alguna restricción adicional, como ajustar el balance de las etiquetas asignadas a los datos no etiquetados, para evitar soluciones degeneradas \cite{van2020survey}. Además, el problema resultante es no convexo, por lo que se recurre a métodos heurísticos y aproximados. Finalmente, destacar que si la suposición de separación en baja densidad no se cumple, el uso de la información no etiquetada puede incluso degradar el rendimiento \cite{van2020survey}.
 
 \subsection{Basados en perturbaciones}
 Por otra parte, los métodos basados en perturbaciones se fundamentan en la suposición de suavidad: puntos cercanos en el espacio de entrada deberían tener etiquetas similares \cite{10.7551/mitpress/9780262033589.001.0001}. Para aprovechar esta suposición, se introducen perturbaciones o ruido estocástico en los datos de entrenamiento y se añade un término de regularización por consistencia a la función de pérdida. Este término penaliza que el modelo produzca predicciones diferentes para las versiones original y perturbada de un mismo ejemplo \cite{van2020survey}.
@@ -160,7 +160,7 @@ Una \gls{NN} es un sistema que transforma un vector de entrada $\mathbf{x}\in\ma
 
 Cada capa de la red se compone de un conjunto de perceptrones, un modelo matemático de neurona. Cada uno de estos perceptrones recibe como entrada un vector $\mathbf{z}\in\mathbb{R}^m$, o bien el de entrada o bien las salidas de la capa anterior, y produce una salida escalar $a\in\mathbb{R}$ mediante la aplicación de una función de activación $\sigma:\mathbb{R}\to\mathbb{R}$ a una combinación lineal de las entradas, es decir, $a=\sigma(\mathbf{w}^{\top}\mathbf{z}+b)$, donde $\mathbf{w}\in\mathbb{R}^m$ y $b\in\mathbb{R}$ son los parámetros del perceptrón \cite{bishop2006pattern}.
 
-En el contexto de aprendizaje supervisado, el entrenamiento de una \gls{NN} consiste en ajustar los parámetros de los perceptrones, representados por una matriz $W$ que contiene tanto los pesos $\mathbf{w}$ como los sesgos $b$, para minimizar una función de pérdida \cite{van2020survey}.
+En el contexto de \gls{SL}, el entrenamiento de una \gls{NN} consiste en ajustar los parámetros de los perceptrones, representados por una matriz $W$ que contiene tanto los pesos $\mathbf{w}$ como los sesgos $b$, para minimizar una función de pérdida \cite{van2020survey}.
 
 \begin{equation}
     \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i;W))
@@ -179,14 +179,14 @@ La función de pérdida total a optimizar se puede formular de la siguiente mane
     \mathcal{L}(W) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i;W)) + \sum_{i=1}^{l+u} \sum_{k=1}^K ReconstructionLoss\bigl(\hat{\mathbf{z}}_i^k, \mathbf{z}_i^k\bigr)
 \end{equation}
 
-Donde $\mathbf{z}_i^k$ es la activación oculta de la capa $k$ en el codificador para el ejemplo limpio $\mathbf{x}_i$, mientras que $\hat{\mathbf{z}}_i^k$ es la activación reconstruida por el decodificador a partir de la versión perturbada. Finalmente, $\text{ReconstructionLoss}$ es una función que penaliza la discrepancia entre ambas (como, por ejemplo, la norma $L_2$ al cuadrado) \cite{rasmus2015semi}.
+Donde $\mathbf{z}_i^k$ es la activación oculta de la capa $k$ en el codificador para el ejemplo limpio $\mathbf{x}_i$, mientras que $\hat{\mathbf{z}}_i^k$ es la activación reconstruida por el decodificador a partir de la versión perturbada. Finalmente, $\text{ReconstructionLoss}$ es una función que penaliza la discrepancia entre ambas, como, por ejemplo, la norma $L_2$ al cuadrado \cite{rasmus2015semi}.
 
 A través de esta arquitectura, las \textit{ladder networks} consiguen aprovechar simultáneamente tanto la señal de los datos etiquetados como la regularización proporcionada por los datos no etiquetados\footnote{Esta simultaneidad es, de hecho, lo que hace a las \textit{ladder networks} modelos intrínsecos, a diferencia del preentrenamiento por capas visto en la Sección \ref{sec:pre-training}, donde se usaba un \textit{encoder-decoder} como fase inicial independiente seguida de la fase supervisada.}, forzando a la red a extraer características latentes útiles y robustas al ruido que, en última instancia, mejoran la generalización del modelo predictivo \cite{rasmus2015semi}.
 
 \section{Métodos Basados en Variedades}
 \label{sec:variedades}
 
-Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque (al igual que los métodos discriminativos) se centran en aprender una función de decisión, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
+Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque al igual que los métodos discriminativos se centran en aprender directamente el modelo de clasificación, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
 
 Estos métodos se apoyan en la hipótesis de la variedad: se asume que los datos observados se concentran cerca de una variedad de baja dimensión inmersa en el espacio de entrada original \cite{10.7551/mitpress/9780262033589.001.0001}. En consecuencia, el papel de los datos no etiquetados no es solo ajustar una frontera global, sino capturar la geometría de dicha variedad y orientar la búsqueda hacia funciones que respeten su estructura intrínseca \cite{van2020survey}.
 
@@ -198,7 +198,7 @@ Usualmente se denota por $W=(w_{ij})$ a la matriz de pesos, y la intuición es q
 
 Una vez construido el grafo, se busca un modelo $f:\mathcal{X}\to\mathcal{Y}$ que no solo clasifique correctamente los ejemplos etiquetados, sino que también sea suave respecto a la estructura del grafo; es decir, que produzca salidas similares en nodos conectados por aristas con pesos altos \cite{zhu2009introduction}.
 
-Para ello, un enfoque representativo es el propuesto por \citet{belkin2005manifold}. Partiendo de un marco de aprendizaje supervisado, se considera un kernel $K$, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Y se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
+Para ello, un enfoque representativo es el propuesto por \citet{belkin2005manifold}. Partiendo de un marco de \gls{SL}, se considera un kernel $K$, con un espacio de funciones asociado $\mathcal{H}_K$ y norma $\|\cdot\|_K$. Y se busca una función $f\in\mathcal{H}_K$ que minimice la siguiente función de pérdida regularizada:
 
 \begin{equation}
     \mathcal{L}(f) = \frac{1}{l} \sum_{i=1}^l c(\mathbf{x}_i,y_i,f(\mathbf{x}_i)) + \lambda \|f\|_K^2,
@@ -226,4 +226,4 @@ donde $\lambda_A$ y $\lambda_I$ son hiperparámetros que controlan el peso relat
 
 Dependiendo de la elección del kernel $K$ y de la función de pérdida $c$, esta formulación puede dar lugar a diferentes algoritmos concretos. Un ejemplo clásico son las \textit{Laplacian SVM}, que combinan una pérdida \textit{hinge} con el término de regularización basado en el grafo. De este modo, a diferencia de las \glspl{S3VM} vistas en la sección anterior, la información no etiquetada se incorpora a través de la geometría del grafo y no mediante la penalización directa de puntos cercanos a la frontera de decisión \cite{van2020survey}.
 
-En la práctica, estos métodos pueden ser costosos computacionalmente, ya que suelen requerir operar con matrices de tamaño $n\times n$ (donde $n=l+u$). En particular, el coste suele ser $O(n^2)$, e incluso puede alcanzar $O(n^3)$ \cite{van2020survey}. Además, el rendimiento es muy sensible a cómo se construye el grafo y a la elección y escala de los pesos $w_{ij}$; si el grafo no refleja bien la geometría de los datos, la información no etiquetada puede propagarse de forma perjudicial \cite{zhu2009introduction}.
+En la práctica, estos métodos pueden ser costosos computacionalmente, ya que suelen requerir operar con matrices de tamaño $n\times n$, donde $n=l+u$. En particular, el coste suele ser $O(n^2)$, e incluso puede alcanzar $O(n^3)$ \cite{van2020survey}. Además, el rendimiento es muy sensible a cómo se construye el grafo y a la elección y escala de los pesos $w_{ij}$; si el grafo no refleja bien la geometría de los datos, la información no etiquetada puede propagarse de forma perjudicial \cite{zhu2009introduction}.
