@@ -6,7 +6,7 @@ Siguiendo la última división de los métodos inductivos presentada en la taxon
 
 \section{Métodos Generativos}
 
-Los métodos generativos constituyen uno de los enfoques clásicos del \gls{SSL} \cite{zhu2005semi}. Su idea central es modelar explícitamente el proceso que genera los datos, esto es, la distribución conjunta $p(\mathbf{x},y)$, y, una vez estimada, usarla de diferentes formas para clasificar \cite{van2020survey}. Este enfoque conecta directamente con la discusión del Capítulo 2 sobre cómo la información de $p(\mathbf{x})$ puede ayudar a inferir $p(y\mid\mathbf{x})$ (Sección \ref{sec:suposiciones}).
+Los métodos generativos constituyen uno de los enfoques clásicos del \gls{SSL} \cite{zhu2005semi}. Su idea central es modelar explícitamente el proceso que genera los datos, esto es, la distribución conjunta $p(\mathbf{x},y)$, y, una vez estimada, usarla de diferentes formas para clasificar \cite{van2020survey}. Este enfoque conecta directamente con la discusión del Capítulo \ref{cap:introducción-formal} sobre cómo la información de $p(\mathbf{x})$ puede ayudar a inferir $p(y\mid\mathbf{x})$ (Sección \ref{sec:suposiciones}).
 
 Dentro de esta familia, el referente clásico son los modelos de mezcla optimizados mediante máxima verosimilitud, normalmente con el algoritmo \gls{EM} cuando hay variables latentes \cite{dempster1977maximum}.
 
@@ -32,7 +32,7 @@ Para realizar dicho cálculo, se emplea la regla de Bayes:
 
 por lo que el problema se reduce a estimar $p(\mathbf{x}|y)$ y $p(y)$. En el contexto de una mezcla de componentes probabilísticos, esto equivale a estimar los parámetros que definen dichas componentes.  
 
-Si denotamos por $\theta$ al vector con los parámetros que definen los modelos y por $D_l=\{(\mathbf{x}_i,y_i)\}_{i=1}^{l}$ al conjunto etiquetado. Entonces el estimador de máxima verosimilitud de los parámetros es
+Si denotamos por $\theta$ al vector con los parámetros que caracterizan las distribuciones y por $D_l=\{(\mathbf{x}_i,y_i)\}_{i=1}^{l}$ al conjunto etiquetado. Entonces el estimador de máxima verosimilitud de los parámetros es
 
 \begin{equation}
     \hat{\theta} = \operatorname*{arg\,max}_{\theta} p(D_l|\theta) = \operatorname*{arg\,max}_{\theta} \log p(D_l|\theta).
@@ -186,7 +186,7 @@ A través de esta arquitectura, las \textit{ladder networks} consiguen aprovecha
 \section{Métodos Basados en Variedades}
 \label{sec:variedades}
 
-Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque al igual que los métodos discriminativos se centran en aprender directamente el modelo de clasificación, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
+Finalmente, los métodos basados en variedades constituyen una categoría independiente en la presente taxonomía. Por un lado, no pueden considerarse generativos, puesto que no modelan explícitamente el proceso de generación de los datos. Por otro lado, aunque al igual que los métodos discriminativos se centran en aprender directamente el clasificador, su enfoque subyacente es diferente al de las técnicas de máximo margen o de perturbaciones.
 
 Estos métodos se apoyan en la hipótesis de la variedad: se asume que los datos observados se concentran cerca de una variedad de baja dimensión inmersa en el espacio de entrada original \cite{10.7551/mitpress/9780262033589.001.0001}. En consecuencia, el papel de los datos no etiquetados no es solo ajustar una frontera global, sino capturar la geometría de dicha variedad y orientar la búsqueda hacia funciones que respeten su estructura intrínseca \cite{van2020survey}.
 
