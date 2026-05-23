@@ -63,7 +63,7 @@ que refleja que la etiqueta de $\mathbf{x}_j$ es desconocida \cite{zhu2009introd
 
 En general, esta optimización deja de ser cóncava y no suele resolverse de forma analítica. Por ello, el método estándar es \gls{EM}, un procedimiento iterativo de máxima verosimilitud con variables latentes \cite{dempster1977maximum}. De forma intuitiva, \gls{EM} repite el siguiente ciclo:
 \begin{itemize}
-    \item \textbf{Inicialización}: partir de unos parámetros iniciales $\theta^{(0)}$ (por ejemplo, obtenidos con los datos etiquetados).
+    \item \textbf{Inicialización}: partir de unos parámetros iniciales $\theta^{(0)}$, por ejemplo, obtenidos con los datos etiquetados.
     \item \textbf{E-step}: con los parámetros actuales, estimar para cada dato no etiquetado la probabilidad de pertenecer a cada clase, es decir, una etiqueta \textit{blanda}.
     \item \textbf{M-step}: de manera análoga al caso supervisado, reestimar los parámetros del modelo, pero usando ahora las etiquetas probabilísticas obtenidas en la E-step como pesos en la máxima verosimilitud.
     \item \textbf{Iteración}: repetir E-step y M-step hasta convergencia.
@@ -76,7 +76,7 @@ La mezcla de modelos es un enfoque que puede ser muy eficaz cuando el modelo gen
 
 \section{Métodos Discriminativos}
 
-Esta familia de métodos se distingue de la anterior en que no trata de modelar el proceso generativo ni la densidad conjunta $p(\mathbf{x},y)$, sino que se centra en aprender directamente la probabilidad condicional $p(y\mid\mathbf{x})$ o un clasificador $f:\mathcal{X}\to\mathcal{Y}$ \cite{ng2001discriminative}. En este caso, la información de los datos no etiquetados se incorpora con el objetivo de mejorar la generalización del modelo, normalmente a través de suposiciones adicionales sobre la distribución subyacente de los datos (por ejemplo, la separación en baja densidad o la suposición de suavidad) \cite{van2020survey}.
+Esta familia de métodos se distingue de la anterior en que no trata de modelar el proceso generativo ni la densidad conjunta $p(\mathbf{x},y)$, sino que se centra en aprender directamente la probabilidad condicional $p(y\mid\mathbf{x})$ o un clasificador $f:\mathcal{X}\to\mathcal{Y}$ \cite{ng2001discriminative}. En este caso, la información de los datos no etiquetados se incorpora con el objetivo de mejorar la generalización del modelo, normalmente a través de suposiciones adicionales sobre la distribución subyacente de los datos, por ejemplo, la separación en baja densidad o la suposición de suavidad \cite{van2020survey}.
 \subsection{Máximo margen}
 \label{subsec:maximo_margen}
 
